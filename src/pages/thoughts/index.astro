@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="随想录 | Wybell" description="Wybell 对学习、工作和生活的一些记录与思考。" currentPath="/thoughts/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">THOUGHTS</p>
+      <h1>随想录</h1>
+      <p>有些内容还没有结论，但它们值得先被写下来，留在之后回头看的路上。</p>
+    </header>
+
+    <section class="space-card-grid" aria-label="随想录最新内容">
+      <a class="space-card" href="/thoughts/learning/">
+        <div class="overview-card-header"><span class="card-kicker">随想录 · 学习思考</span><span class="card-arrow" aria-hidden="true">↗</span></div>
+        <h2>学习思考</h2>
+        <p>关于如何学习、如何理解一个问题，以及如何把理解变成自己的东西。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+      <a class="space-card" href="/thoughts/work/">
+        <div class="overview-card-header"><span class="card-kicker">随想录 · 工作感受</span><span class="card-arrow" aria-hidden="true">↗</span></div>
+        <h2>工作感受</h2>
+        <p>从真实工作里看到的协作、交付和自己的变化。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+      <a class="space-card" href="/thoughts/life/">
+        <div class="overview-card-header"><span class="card-kicker">随想录 · 生活感受</span><span class="card-arrow" aria-hidden="true">↗</span></div>
+        <h2>生活感受</h2>
+        <p>对日常、选择和生活节奏的一些不定期记录。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+      <a class="space-card" href="/thoughts/retrospective/">
+        <div class="overview-card-header"><span class="card-kicker">随想录 · 随笔灵思</span><span class="card-arrow" aria-hidden="true">↗</span></div>
+        <h2>随笔灵思</h2>
+        <p>阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+    </section>
+  </main>
+</BaseLayout>

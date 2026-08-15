@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const items = await getCollection("media", ({ data }) => !data.draft);
+
+  return items.map((item) => ({
+    params: { slug: item.id },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+---
+
+<BaseLayout title={`${item.data.title} | 影像片段 | Wybell`} description={item.data.description} currentPath="/life/media/">
+  <main class="container space-page">
+    <article class="media-detail">
+      <header class="page-heading space-heading">
+        <p class="eyebrow">LIFE SPACE / MEDIA</p>
+        <h1>{item.data.title}</h1>
+        <p>{item.data.description}</p>
+        <div class="thoughts-post-meta media-detail-meta">
+          <time datetime={item.data.capturedDate.toISOString()}>{item.data.capturedDate.toLocaleDateString("zh-CN")}</time>
+          {item.data.location && <span>{item.data.location}</span>}
+          <span>{item.data.type === "video" ? "视频" : "照片"}</span>
+        </div>
+      </header>
+
+      <div class="media-detail-visual">
+        {item.data.src ? (
+          item.data.type === "image" ? (
+            <img src={item.data.src} alt={item.data.title} />
+          ) : (
+            <video src={item.data.src} poster={item.data.poster} controls playsinline preload="metadata"></video>
+          )
+        ) : (
+          <div class="media-card-placeholder"><span>MEDIA</span></div>
+        )}
+      </div>
+
+      <div class="post-content media-detail-content"><Content /></div>
+    </article>
+  </main>
+</BaseLayout>

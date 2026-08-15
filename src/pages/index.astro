@@ -1,17 +1,114 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getTechnicalPosts } from "../lib/technical";
+import { projects, skillGroups } from "../site.config";
 
+const [learningPosts, practicePosts] = await Promise.all([
+  getTechnicalPosts("learning"),
+  getTechnicalPosts("practice"),
+]);
+const latestPost = learningPosts[0];
+const latestPractice = practicePosts[0];
+
+const featuredProjects = projects.filter((project) => ["ai-interview-assistant", "eventflow"].includes(project.slug));
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout currentPath="/">
+  <main class="container home-main">
+    <section class="project-showcase" aria-label="精选项目">
+      {featuredProjects.map((project) => {
+        const destination = project.live || `/projects/${project.slug}/`;
+        const isExternal = Boolean(project.live);
+        const projectVisual = project.slug === "eventflow" ? "/project-eventflow.png" : "/project-ai.png";
+        return (
+          <a class:list={["project-link-card", project.slug === "eventflow" ? "project-link-eventflow" : "project-link-ai"]} href={destination} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
+            <div class="project-link-topline">
+              <span class="card-kicker">{project.slug === "eventflow" ? "EVENTFLOW" : "AI INTERVIEW"}</span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h2>{project.name}</h2>
+            <p>{project.slug === "eventflow" ? "活动报名与配额管理系统，直接进入报名系统。" : "从简历处理到模拟面试与反馈报告的求职应用。"}</p>
+            <span class="project-link-status">{isExternal ? "进入在线系统" : "项目地址待补充 · 先查看项目"}</span>
+            <img class="project-link-thumb" src={projectVisual} alt="" aria-hidden="true" loading="lazy" />
+          </a>
+        );
+      })}
+    </section>
+
+    <section class="technical-home" aria-label="技术空间最新内容">
+      <div class="technical-home-grid">
+        <a class="technical-feature-card technical-stack-card" href="/technical/stack/">
+          <div class="overview-card-header">
+            <span class="card-kicker">技术空间 · 技术栈</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <h3>当前技术栈</h3>
+          <p>按实际接触过的项目方向整理，不代表熟练度排序。</p>
+          <div class="stack-overview-grid">
+            {skillGroups.map((group) => (
+              <div class="stack-overview-group">
+                <span class="stack-overview-label">{group.label}</span>
+                <div class="stack-overview-items">
+                  {group.items.map((skill) => <span>{skill}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </a>
+
+        <div class="technical-mini-grid" aria-label="技术内容预览">
+          <a class="technical-mini-card technical-learning-card" href={latestPost ? `/posts/${latestPost.id}/` : "/technical/learning/"}>
+            <div class="overview-card-header">
+              <span class="card-kicker">技术空间 · 技术学习</span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h3>{latestPost ? latestPost.data.title : "最近技术记录"}</h3>
+            <p>{latestPost ? latestPost.data.description : "技术学习记录正在整理中。"}</p>
+            <span class="technical-card-meta">{latestPost ? latestPost.data.pubDate.toLocaleDateString("zh-CN") : "内容待补充"}</span>
+          </a>
+
+          <a class="technical-mini-card technical-practice-card" href={latestPractice ? `/posts/${latestPractice.id}/` : "/technical/practice/"}>
+            <div class="overview-card-header">
+              <span class="card-kicker">技术空间 · 工程实践</span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h3>{latestPractice ? latestPractice.data.title : "工程实践记录"}</h3>
+            <p>{latestPractice ? latestPractice.data.description : "权限、事务、数据一致性、部署和持续交付等问题，会在这里逐步整理成文章。"}</p>
+            <span class="technical-card-meta">{latestPractice ? latestPractice.data.pubDate.toLocaleDateString("zh-CN") : "内容待补充"}</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <a class="now-card status-card" href="/about/status/" aria-labelledby="now-title">
+      <div>
+        <p class="card-kicker">关于我 · 目前状态</p>
+        <h2 id="now-title">目前状态</h2>
+      </div>
+      <p>实习已经完成，两个个人项目已部署；现在继续准备秋招，补齐 Java 后端基础，并把做过的功能整理成可复盘的记录。</p>
+      <span class="card-arrow" aria-hidden="true">↗</span>
+    </a>
+
+    <section class="personal-preview-grid" aria-label="生活与随想最新内容">
+      <a class="overview-card personal-preview-card hobbies-card" href="/life/hobbies/">
+        <div class="overview-card-header">
+          <span class="card-kicker">生活空间 · 兴趣爱好</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </div>
+        <h2>兴趣爱好</h2>
+        <p>记录那些愿意持续投入的兴趣，以及工作和学习之外留下来的小片段。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+
+      <a class="overview-card personal-preview-card thoughts-card" href="/thoughts/retrospective/">
+        <div class="overview-card-header">
+          <span class="card-kicker">随想录 · 随笔灵思</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </div>
+        <h2>随笔灵思</h2>
+        <p>阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。</p>
+        <span class="card-placeholder">最新内容待补充</span>
+      </a>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { experiences } from "../../site.config";
+---
+
+<BaseLayout title="工作经历 | Wybell" description="Wybell 的工作实践与交付经验。" currentPath="/technical/experience/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">WORK EXPERIENCE</p>
+      <h1>工作经历</h1>
+      <p>这里记录可以公开表达的工作方法和经验，不公开公司源代码、内部地址、账号、数据库细节或敏感业务规则。</p>
+    </header>
+
+    <section class="experience-list" aria-label="工作经历列表">
+      {experiences.map((experience) => (
+        <article class="experience-item">
+          <time class="experience-period">{experience.period}</time>
+          <div class="experience-content">
+            <span class="experience-marker" aria-hidden="true"></span>
+            <h2>{experience.title}</h2>
+            <p class="experience-organization">{experience.organization}</p>
+            <p>{experience.summary}</p>
+            <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="section">
+      <div class="about-strip">
+        <div>
+          <p class="eyebrow">HOW I WORK</p>
+          <h2>从现象开始，走到上线验证。</h2>
+        </div>
+        <div>
+          <p>我通常按这样的路径处理问题：</p>
+          <div class="timeline-stack experience-process">
+            <span>复现现象</span>
+            <span>查看日志</span>
+            <span>缩小范围</span>
+            <span>定位根因</span>
+            <span>修改代码</span>
+            <span>回归测试</span>
+            <span>上线验证</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,0 +1,82 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostLayout from "../../layouts/PostLayout.astro";
+import { getArticleNavigation, getArticleWordCount } from "../../lib/article";
+import { projects } from "../../site.config";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft && data.section === "project");
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project, post: posts.find((item) => item.data.projectSlug === project.slug) },
+  }));
+}
+
+const { project, post } = Astro.props;
+const projectPosts = await getCollection("blog", ({ data }) => !data.draft && data.section === "project");
+const navigation = post ? getArticleNavigation(projectPosts, post.id) : { previous: undefined, next: undefined };
+const rendered = post ? await render(post) : undefined;
+const Content = rendered?.Content;
+const headings = rendered?.headings ?? [];
+---
+
+{post && Content ? (
+  <PostLayout
+    title={post.data.title}
+    description={post.data.description}
+    pubDate={post.data.pubDate}
+    updatedDate={post.data.updatedDate}
+    wordCount={getArticleWordCount(post.body)}
+    headings={headings}
+    cover={post.data.cover}
+    coverAlt={post.data.coverAlt}
+    tocImage={post.data.tocImage}
+    tocImageAlt={post.data.tocImageAlt}
+    currentPath="/technical/projects/"
+    eyebrow={`PROJECT / ${project.name.toUpperCase()}`}
+    previous={navigation.previous?.data.projectSlug ? { title: navigation.previous.data.title, href: `/projects/${navigation.previous.data.projectSlug}/` } : undefined}
+    next={navigation.next?.data.projectSlug ? { title: navigation.next.data.title, href: `/projects/${navigation.next.data.projectSlug}/` } : undefined}
+  >
+    <Content />
+  </PostLayout>
+) : (
+<BaseLayout title={`${project.name} | 项目 | Wybell`} description={project.summary} currentPath="/technical/projects/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">PROJECT</p>
+      <h1>{project.name}</h1>
+      <p>{project.summary}</p>
+    </header>
+
+    <section class="about-layout project-article-layout">
+      <article class="about-copy">
+        <p class="eyebrow">WHAT I LEARNED</p>
+        <p>{project.description}</p>
+        <h2>我在这个项目里做了什么</h2>
+        <ul>{project.highlights.map((highlight) => <li>{highlight}</li>)}</ul>
+        <h2>项目里的几个关键词</h2>
+        <div class="chip-list compact-chip-list">
+          {project.stack.map((item) => <span>{item}</span>)}
+        </div>
+        <div class="project-detail-links project-article-links">
+          {project.github && <a href={project.github} target="_blank" rel="noreferrer">打开 GitHub ↗</a>}
+          {project.live && <a href={project.live} target="_blank" rel="noreferrer">在线访问 ↗</a>}
+        </div>
+      </article>
+
+      <aside class="about-card">
+        <p class="eyebrow">PROJECT NOTES</p>
+        <h2>项目资料</h2>
+        <dl class="contact-list">
+          <div><dt>我的角色</dt><dd>{project.role}</dd></div>
+          <div><dt>状态</dt><dd>{project.status}</dd></div>
+          <div><dt>技术栈</dt><dd>{project.stack.join(" · ")}</dd></div>
+          <div><dt>在线地址</dt><dd>{project.live ? "已配置" : "待部署"}</dd></div>
+        </dl>
+      </aside>
+    </section>
+  </main>
+</BaseLayout>
+)}

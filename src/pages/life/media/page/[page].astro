@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import MediaCard from "../../../../components/MediaCard.astro";
+import { getLifeMedia, getMediaPage, getMediaPageCount } from "../../../../lib/life";
+
+export async function getStaticPaths() {
+  const allMedia = await getLifeMedia();
+  const totalPages = getMediaPageCount(allMedia.length);
+
+  return Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: { items: getMediaPage(allMedia, page), page, totalPages },
+    };
+  });
+}
+
+const { items, page, totalPages } = Astro.props;
+const pagePath = (value: number) => value === 1 ? "/life/media/" : `/life/media/page/${value}/`;
+---
+
+<BaseLayout title="影像片段 | 生活空间 | Wybell" description="Wybell 的照片与视频记录。" currentPath="/life/media/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">LIFE SPACE / MEDIA</p>
+      <h1>影像片段</h1>
+      <p>照片和视频适合留下画面本身，这里会按时间整理成一组轻量的影像记录。</p>
+    </header>
+
+    <section class="media-gallery" aria-label="影像片段画廊">
+      {items.map((item) => <MediaCard item={item} />)}
+    </section>
+
+    <nav class="thoughts-pagination" aria-label="影像片段分页">
+      {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+      <span>第 {page} / {totalPages} 页</span>
+      {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+    </nav>
+  </main>
+</BaseLayout>

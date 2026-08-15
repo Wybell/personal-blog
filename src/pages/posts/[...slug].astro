@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from "astro:content";
+import PostLayout from "../../layouts/PostLayout.astro";
+import { getArticleNavigation, getArticleWordCount } from "../../lib/article";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const navigation = getArticleNavigation(allPosts, post.id);
+const { Content, headings } = await render(post);
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  wordCount={getArticleWordCount(post.body)}
+  headings={headings}
+  cover={post.data.cover}
+  coverAlt={post.data.coverAlt}
+  tocImage={post.data.tocImage}
+  tocImageAlt={post.data.tocImageAlt}
+  previous={navigation.previous ? { title: navigation.previous.data.title, href: `/posts/${navigation.previous.id}/` } : undefined}
+  next={navigation.next ? { title: navigation.next.data.title, href: `/posts/${navigation.next.id}/` } : undefined}
+>
+  <Content />
+</PostLayout>

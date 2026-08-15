@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getLifeMedia, getLifePosts } from "../../lib/life";
+
+const [daily, travel, hobbies, reading, media] = await Promise.all([
+  getLifePosts("daily"),
+  getLifePosts("travel"),
+  getLifePosts("hobbies"),
+  getLifePosts("reading"),
+  getLifeMedia(),
+]);
+
+const lifePreviews = [
+  {
+    href: daily[0] ? `/life/daily/${daily[0].id}/` : "/life/daily/",
+    region: "生活空间 · 日常记录",
+    title: daily[0]?.data.title ?? "最新日常记录",
+    description: daily[0]?.data.description ?? "最近发生的一件小事、一段普通但值得留下来的日子。",
+    placeholder: daily[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+    featured: true,
+  },
+  {
+    href: travel[0] ? `/life/travel/${travel[0].id}/` : "/life/travel/",
+    region: "生活空间 · 旅行见闻",
+    title: travel[0]?.data.title ?? "最新旅行见闻",
+    description: travel[0]?.data.description ?? "去过的地方，以及沿途看到、听到和记住的片段。",
+    placeholder: travel[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+  },
+  {
+    href: hobbies[0] ? `/life/hobbies/${hobbies[0].id}/` : "/life/hobbies/",
+    region: "生活空间 · 兴趣爱好",
+    title: hobbies[0]?.data.title ?? "最近在做的事",
+    description: hobbies[0]?.data.description ?? "工作和学习之外，正在慢慢形成的兴趣。",
+    placeholder: hobbies[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+  },
+  {
+    href: media[0] ? `/life/media/${media[0].id}/` : "/life/media/",
+    region: "生活空间 · 影像片段",
+    title: media[0]?.data.title ?? "最新影像片段",
+    description: media[0]?.data.description ?? "照片、短视频和之后准备放进这里的动态素材。",
+    placeholder: media[0]?.data.capturedDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+  },
+  {
+    href: reading[0] ? `/life/reading/${reading[0].id}/` : "/life/reading/",
+    region: "生活空间 · 阅读观影",
+    title: reading[0]?.data.title ?? "最近读到或看到的内容",
+    description: reading[0]?.data.description ?? "读过的书、看过的电影，以及留下来的片刻感受。",
+    placeholder: reading[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+  },
+];
+---
+
+<BaseLayout title="生活空间 | Wybell" description="Wybell 的日常、兴趣、见闻与生活记录。" currentPath="/life/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">LIFE SPACE</p>
+      <h1>生活空间</h1>
+      <p>不只记录完成了什么，也留一点位置给日常、兴趣和那些正在发生的小事。</p>
+    </header>
+
+    <section class="space-card-grid" aria-label="生活空间最新内容">
+      {lifePreviews.map((preview) => (
+        <a class:list={["space-card", { "space-card-featured": preview.featured }]} href={preview.href}>
+          <div class="overview-card-header">
+            <span class="card-kicker">{preview.region}</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <h2>{preview.title}</h2>
+          <p>{preview.description}</p>
+          <span class="card-placeholder">{preview.placeholder}</span>
+        </a>
+      ))}
+    </section>
+  </main>
+</BaseLayout>

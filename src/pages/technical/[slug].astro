@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import TechnicalPostCard from "../../components/TechnicalPostCard.astro";
+import { getTechnicalPage, getTechnicalPageCount, getTechnicalPosts, technicalSectionLabels } from "../../lib/technical";
+import { experiences, projects, sectionNavigation, skillGroups } from "../../site.config";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const item of sectionNavigation.technical.slice(1)) {
+    const slug = item.href.split("/").filter(Boolean).pop() ?? "";
+
+    if (slug === "learning" || slug === "practice") {
+      const allPosts = await getTechnicalPosts(slug);
+      paths.push({
+        params: { slug },
+        props: { item, posts: getTechnicalPage(allPosts, 1), page: 1, totalPages: getTechnicalPageCount(allPosts.length) },
+      });
+    } else {
+      paths.push({ params: { slug }, props: { item } });
+    }
+  }
+
+  return paths;
+}
+
+const { item, posts = [], page = 1, totalPages = 0 } = Astro.props;
+const slug = Astro.params.slug;
+const isArticleSection = slug === "learning" || slug === "practice";
+const pagePath = (value: number) => value === 1 ? `/technical/${slug}/` : `/technical/${slug}/page/${value}/`;
+---
+
+<BaseLayout title={`${item.label} | 技术空间 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">TECHNICAL SPACE / {item.label.toUpperCase()}</p>
+      <h1>{item.label}</h1>
+      <p>{isArticleSection ? "每一张卡片对应一篇记录，按时间从新到旧排列。" : "这是技术空间中的一个内容分区，内容会随着项目和工作过程逐步更新。"}</p>
+    </header>
+
+    {slug === "projects" && (
+      <section class="project-card-grid" aria-label="项目实践列表">
+        {projects.map((project) => <ProjectCard project={project} />)}
+      </section>
+    )}
+
+    {isArticleSection && (
+      posts.length > 0 ? (
+        <section class="thoughts-post-grid" aria-label={`${technicalSectionLabels[slug as keyof typeof technicalSectionLabels]}文章列表`}>
+          {posts.map((post) => <TechnicalPostCard post={post} />)}
+        </section>
+      ) : (
+        <section class="thoughts-empty" aria-label={`${item.label}暂无文章`}>
+          <p class="eyebrow">{item.label}</p>
+          <h2>还没有新的记录</h2>
+          <p>在 src/content/blog 新增一篇 Markdown，并将 section 设置为 {slug} 即可发布。</p>
+        </section>
+      )
+    )}
+
+    {slug === "stack" && (
+      <section class="skill-groups" aria-label="技术栈分类">
+        <p class="skill-intro">当前接触和持续使用的技术，会随着项目实践逐步调整。</p>
+        {skillGroups.map((group) => (
+          <section class="skill-group">
+            <h2>{group.label}</h2>
+            <div class="chip-list skill-group-list">{group.items.map((skill) => <span>{skill}</span>)}</div>
+          </section>
+        ))}
+      </section>
+    )}
+
+    {slug === "experience" && (
+      <section class="experience-list" aria-label="工作经历列表">
+        {experiences.map((experience) => (
+          <article class="experience-item">
+            <time class="experience-period">{experience.period}</time>
+            <div class="experience-content">
+              <span class="experience-marker" aria-hidden="true"></span>
+              <h2>{experience.title}</h2>
+              <p class="experience-organization">{experience.organization}</p>
+              <p>{experience.summary}</p>
+              <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
+            </div>
+          </article>
+        ))}
+      </section>
+    )}
+
+    {isArticleSection && totalPages > 1 && (
+      <nav class="thoughts-pagination" aria-label="技术文章分页">
+        {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+        <span>第 {page} / {totalPages} 页</span>
+        {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+      </nav>
+    )}
+  </main>
+</BaseLayout>

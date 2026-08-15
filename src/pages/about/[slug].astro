@@ -1,0 +1,120 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { experiences, sectionNavigation, siteConfig } from "../../site.config";
+
+export function getStaticPaths() {
+  return sectionNavigation.about.slice(1).map((item) => ({
+    params: { slug: item.href.split("/").filter(Boolean).pop() },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const slug = Astro.params.slug;
+const establishedAt = new Date(`${siteConfig.establishedDate}T00:00:00+08:00`);
+const initialSiteAge = Math.max(0, Math.floor((Date.now() - establishedAt.getTime()) / 86400000));
+const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
+---
+
+<BaseLayout title={`${item.label} | 关于我 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">ABOUT / {item.label.toUpperCase()}</p>
+      <h1>{item.label}</h1>
+      <p>
+        {slug === "experience"
+          ? "记录从实习到个人项目的实践轨迹，重点保留我实际参与、实现和验证过的内容。"
+          : slug === "status"
+            ? "记录当前的学习、求职和项目状态，内容会随着实际进展更新。"
+            : slug === "contact"
+              ? "保留适合公开使用的联系方式，项目交流和技术讨论都可以从这里开始。"
+              : slug === "site"
+                ? "记录这个个人空间为什么存在，以及它目前是怎样运行的。"
+                : "记录真实经历、当前状态和这个个人空间的变化。"}
+      </p>
+    </header>
+    {slug === "experience" && (
+      <section class="experience-list" aria-label="经历轨迹">
+        {experiences.map((experience) => (
+          <article class="experience-item">
+            <time class="experience-period">{experience.period}</time>
+            <div class="experience-content">
+              <span class="experience-marker" aria-hidden="true"></span>
+              <h2>{experience.title}</h2>
+              <p class="experience-organization">{experience.organization}</p>
+              <p>{experience.summary}</p>
+              <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
+            </div>
+          </article>
+        ))}
+      </section>
+    )}
+
+    {slug === "status" && (
+      <article class="about-copy about-direct-content">
+        <p class="eyebrow">CURRENT STATUS</p>
+        <h2>目前状态</h2>
+        <p>我是广州大学软件工程专业 2027 届学生，当前以 Java 后端开发为主要求职方向。实习已经结束，两个个人项目已经完成部署，我正在把项目实现、实习经历和技术基础整理成可以被清楚说明的内容，同时继续准备秋招。</p>
+        <p>目前的重点不是继续堆叠项目数量，而是把已经做过的功能讲深：包括 Spring Boot 业务分层、MySQL 数据一致性、JWT 与权限边界、事务、异常场景，以及部署之后如何验证系统确实可用。还没有完成或没有验证过的能力，会继续标记为学习和后续计划。</p>
+        <dl class="about-fact-list">
+          <div><dt>教育背景</dt><dd>广州大学 · 软件工程 · 2027 届</dd></div>
+          <div><dt>求职方向</dt><dd>Java 后端开发</dd></div>
+          <div><dt>所在城市</dt><dd>广州</dd></div>
+          <div><dt>实习状态</dt><dd>已完成 · 73 个工单已测试并上线</dd></div>
+          <div><dt>项目状态</dt><dd>AI 面试助手、EventFlow 已部署</dd></div>
+          <div><dt>当前关注</dt><dd>Java / Spring Boot、MySQL、Redis、事务、权限与数据一致性</dd></div>
+        </dl>
+      </article>
+    )}
+
+    {slug === "contact" && (
+      <article class="about-copy about-direct-content">
+        <p class="eyebrow">CONTACT</p>
+        <h2>联系方式</h2>
+        <p>如果你想了解项目、交流技术，或者只是想打个招呼，可以通过下面的方式联系我。</p>
+        <dl class="about-fact-list">
+          <div><dt>公开邮箱</dt><dd><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></dd></div>
+          <div><dt>GitHub</dt><dd>{siteConfig.github ? <a href={siteConfig.github} target="_blank" rel="noreferrer">打开主页 ↗</a> : "主页待补充"}</dd></div>
+        </dl>
+      </article>
+    )}
+
+    {slug === "site" && (
+      <article class="about-copy about-direct-content">
+        <p class="eyebrow">ABOUT THIS SITE</p>
+        <h2>关于本站</h2>
+        <p>这是一个用来记录项目、学习、工作和生活的个人空间。内容会随着实际经历慢慢更新，不追求一次完成。</p>
+        <dl class="about-fact-list site-fact-list">
+          <div><dt>建立时间</dt><dd>{establishedDateLabel}</dd></div>
+          <div><dt>已经运行</dt><dd><span data-site-age data-established={siteConfig.establishedDate}>{initialSiteAge} 天</span></dd></div>
+          <div><dt>累计访问</dt><dd><span id="busuanzi_value_site_pv">统计中</span></dd></div>
+          <div><dt>生成方式</dt><dd>Astro · 静态站点</dd></div>
+        </dl>
+        <ul class="about-inline-list">
+          <li>Astro</li>
+          <li>Markdown</li>
+          <li>Static Site Generation</li>
+        </ul>
+      </article>
+    )}
+  </main>
+</BaseLayout>
+
+{slug === "site" && (
+  <script>
+    const siteAge = document.querySelector("[data-site-age]");
+
+    if (siteAge) {
+      const established = siteAge.getAttribute("data-established");
+      const start = established ? new Date(`${established}T00:00:00+08:00`).getTime() : Date.now();
+
+      const updateSiteAge = () => {
+        const days = Math.max(0, Math.floor((Date.now() - start) / 86400000));
+        siteAge.textContent = `${days} 天`;
+      };
+
+      updateSiteAge();
+      window.setInterval(updateSiteAge, 60000);
+    }
+  </script>
+)}

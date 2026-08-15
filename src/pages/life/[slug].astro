@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MediaCard from "../../components/MediaCard.astro";
+import PlaceholderSection from "../../components/PlaceholderSection.astro";
+import LifePostCard from "../../components/LifePostCard.astro";
+import { getLifeMedia, getLifePage, getLifePageCount, getLifePosts } from "../../lib/life";
+import { sectionNavigation } from "../../site.config";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const item of sectionNavigation.life.slice(1)) {
+    const slug = item.href.split("/").filter(Boolean).pop() ?? "";
+
+    if (slug === "media") {
+      const mediaItems = await getLifeMedia();
+      paths.push({ params: { slug }, props: { item, mediaItems, mediaPage: 1, totalMediaPages: 1 } });
+      continue;
+    }
+
+    const allPosts = await getLifePosts(slug);
+    paths.push({
+      params: { slug },
+      props: { item, posts: getLifePage(allPosts, 1), page: 1, totalPages: getLifePageCount(allPosts.length) },
+    });
+  }
+
+  return paths;
+}
+
+const { item, posts = [], page = 1, totalPages = 0, mediaItems = [] } = Astro.props;
+const section = Astro.params.slug;
+const isMedia = section === "media";
+const pagePath = (value: number) => value === 1 ? `/life/${section}/` : `/life/${section}/page/${value}/`;
+---
+
+<BaseLayout title={`${item.label} | 生活空间 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">LIFE SPACE / {item.label.toUpperCase()}</p>
+      <h1>{item.label}</h1>
+      <p>{isMedia ? "照片和视频适合留下画面本身，这里会按时间整理成一组轻量的影像记录。" : "每一张卡片对应一篇生活记录，按时间从新到旧排列。"}</p>
+    </header>
+
+    {isMedia ? (
+      mediaItems.length > 0 ? (
+        <section class="media-gallery" aria-label="影像片段画廊">
+          {mediaItems.map((mediaItem) => <MediaCard item={mediaItem} />)}
+        </section>
+      ) : (
+        <PlaceholderSection eyebrow="LIFE SPACE / MEDIA" title="影像还在路上" description="准备好照片或视频后，在 src/content/media 新增一份 Markdown，填入素材地址即可出现在这里。" />
+      )
+    ) : (
+      posts.length > 0 ? (
+        <section class="thoughts-post-grid" aria-label={`${item.label}文章列表`}>
+          {posts.map((post) => <LifePostCard post={post} />)}
+        </section>
+      ) : (
+        <section class="thoughts-empty" aria-label={`${item.label}暂无记录`}>
+          <p class="eyebrow">{item.label}</p>
+          <h2>还没有新的记录</h2>
+          <p>等有值得写下来的内容后，在这个分区新增一篇 Markdown 文章即可。</p>
+        </section>
+      )
+    )}
+
+    {!isMedia && totalPages > 1 && (
+      <nav class="thoughts-pagination" aria-label="生活记录分页">
+        {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+        <span>第 {page} / {totalPages} 页</span>
+        {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+      </nav>
+    )}
+  </main>
+</BaseLayout>

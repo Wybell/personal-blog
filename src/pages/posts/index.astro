@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="技术学习 | Wybell" description="Wybell 的技术学习、项目复盘与问题记录。" currentPath="/technical/learning/">
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">TECHNICAL LEARNING</p>
+      <h1>技术学习</h1>
+      <p>记录项目里遇到的问题、做过的选择，以及那些值得下次少走一步的经验。</p>
+    </header>
+
+    <section class="post-index" aria-label="技术学习文章列表">
+      {posts.map((post) => (
+        <article class="post-index-item">
+          <time class="post-date" datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+          <div>
+            <h2><a href={`/posts/${post.id}/`}>{post.data.title}</a></h2>
+            <p>{post.data.description}</p>
+            <div class="chip-list compact-chip-list">
+              {post.data.tags.map((tag) => <span>{tag}</span>)}
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  </main>
+</BaseLayout>

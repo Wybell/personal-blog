@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import { getThoughtPage, getThoughtPageCount, getThoughtPosts } from "../../../../lib/thoughts";
+import { sectionNavigation } from "../../../../site.config";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const item of sectionNavigation.thoughts.slice(1)) {
+    const section = item.href.split("/").filter(Boolean).pop() ?? "";
+    const allPosts = await getThoughtPosts(section);
+    const totalPages = getThoughtPageCount(allPosts.length);
+
+    for (let page = 2; page <= totalPages; page += 1) {
+      paths.push({
+        params: { section, page: String(page) },
+        props: { item, posts: getThoughtPage(allPosts, page), page, totalPages },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { item, posts, page, totalPages } = Astro.props;
+const section = Astro.params.section;
+const pagePath = (value: number) => value === 1 ? `/thoughts/${section}/` : `/thoughts/${section}/page/${value}/`;
+---
+
+<BaseLayout title={`${item.label} | 随想录 | Wybell`} description={`Wybell 的${item.label}文章列表。`} currentPath={`/thoughts/${section}/`}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">THOUGHTS / {item.label.toUpperCase()}</p>
+      <h1>{item.label}</h1>
+      <p>每一张卡片对应一篇记录，按时间从新到旧排列。</p>
+    </header>
+
+    <section class="thoughts-post-grid" aria-label={`${item.label}文章列表`}>
+      {posts.map((post) => (
+        <a class="thoughts-post-card" href={`/thoughts/${section}/${post.id}/`}>
+          <div class="overview-card-header">
+            <span class="card-kicker">随想录 · {item.label}</span>
+            <span class="card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <h2>{post.data.title}</h2>
+          <p>{post.data.description}</p>
+          <div class="thoughts-post-meta">
+            <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+            {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+          </div>
+        </a>
+      ))}
+    </section>
+
+    <nav class="thoughts-pagination" aria-label="文章分页">
+      {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+      <span>第 {page} / {totalPages} 页</span>
+      {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+    </nav>
+  </main>
+</BaseLayout>

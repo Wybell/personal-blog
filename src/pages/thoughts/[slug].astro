@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sectionNavigation } from "../../site.config";
+import { getThoughtPage, getThoughtPageCount, getThoughtPosts } from "../../lib/thoughts";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const item of sectionNavigation.thoughts.slice(1)) {
+    const section = item.href.split("/").filter(Boolean).pop() ?? "";
+    const allPosts = await getThoughtPosts(section);
+    paths.push({
+      params: { slug: section },
+      props: {
+        item,
+        posts: getThoughtPage(allPosts, 1),
+        page: 1,
+        totalPages: getThoughtPageCount(allPosts.length),
+      },
+    });
+  }
+
+  return paths;
+}
+
+const { item, posts, page, totalPages } = Astro.props;
+const section = Astro.params.slug;
+const pagePath = (value: number) => value === 1 ? `/thoughts/${section}/` : `/thoughts/${section}/page/${value}/`;
+---
+
+<BaseLayout title={`${item.label} | 随想录 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">THOUGHTS / {item.label.toUpperCase()}</p>
+      <h1>{item.label}</h1>
+      <p>每一张卡片对应一篇记录，按时间从新到旧排列。</p>
+    </header>
+
+    {posts.length > 0 ? (
+      <section class="thoughts-post-grid" aria-label={`${item.label}文章列表`}>
+        {posts.map((post) => (
+          <a class="thoughts-post-card" href={`/thoughts/${section}/${post.id}/`}>
+            <div class="overview-card-header">
+              <span class="card-kicker">随想录 · {item.label}</span>
+              <span class="card-arrow" aria-hidden="true">↗</span>
+            </div>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <div class="thoughts-post-meta">
+              <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+              {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+            </div>
+          </a>
+        ))}
+      </section>
+    ) : (
+      <section class="thoughts-empty" aria-label={`${item.label}暂无文章`}>
+        <p class="eyebrow">{item.label}</p>
+        <h2>还没有新的记录</h2>
+        <p>等有值得写下来的内容后，在这个分区新增一篇 Markdown 文章即可。</p>
+      </section>
+    )}
+
+    {totalPages > 1 && (
+      <nav class="thoughts-pagination" aria-label="文章分页">
+        {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+        <span>第 {page} / {totalPages} 页</span>
+        {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+      </nav>
+    )}
+  </main>
+</BaseLayout>

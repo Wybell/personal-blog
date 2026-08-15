@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import LifePostCard from "../../../../components/LifePostCard.astro";
+import { getLifePage, getLifePageCount, getLifePosts, lifeSectionLabels } from "../../../../lib/life";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const section of Object.keys(lifeSectionLabels)) {
+    const allPosts = await getLifePosts(section);
+    const totalPages = getLifePageCount(allPosts.length);
+
+    for (let page = 2; page <= totalPages; page += 1) {
+      paths.push({
+        params: { section, page: String(page) },
+        props: { posts: getLifePage(allPosts, page), page, totalPages, label: lifeSectionLabels[section as keyof typeof lifeSectionLabels] },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { posts, page, totalPages, label } = Astro.props;
+const section = Astro.params.section;
+const pagePath = (value: number) => value === 1 ? `/life/${section}/` : `/life/${section}/page/${value}/`;
+---
+
+<BaseLayout title={`${label} | 生活空间 | Wybell`} description={`Wybell 的${label}记录列表。`} currentPath={`/life/${section}/`}>
+  <main class="container space-page">
+    <header class="page-heading space-heading">
+      <p class="eyebrow">LIFE SPACE / {label.toUpperCase()}</p>
+      <h1>{label}</h1>
+      <p>每一张卡片对应一篇生活记录，按时间从新到旧排列。</p>
+    </header>
+
+    <section class="thoughts-post-grid" aria-label={`${label}文章列表`}>
+      {posts.map((post) => <LifePostCard post={post} />)}
+    </section>
+
+    <nav class="thoughts-pagination" aria-label="生活记录分页">
+      {page > 1 ? <a href={pagePath(page - 1)}>上一页</a> : <span class="is-disabled">上一页</span>}
+      <span>第 {page} / {totalPages} 页</span>
+      {page < totalPages ? <a href={pagePath(page + 1)}>下一页</a> : <span class="is-disabled">下一页</span>}
+    </nav>
+  </main>
+</BaseLayout>

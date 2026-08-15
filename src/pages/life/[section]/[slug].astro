@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from "astro:content";
+import PostLayout from "../../../layouts/PostLayout.astro";
+import { getArticleNavigation, getArticleWordCount } from "../../../lib/article";
+import { lifeSectionLabels } from "../../../lib/life";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("life", ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { section: post.data.section, slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const allPosts = await getCollection("life", ({ data }) => !data.draft && data.section === post.data.section);
+const navigation = getArticleNavigation(allPosts, post.id);
+const { Content, headings } = await render(post);
+const sectionLabel = lifeSectionLabels[post.data.section];
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  wordCount={getArticleWordCount(post.body)}
+  headings={headings}
+  cover={post.data.cover}
+  coverAlt={post.data.coverAlt}
+  tocImage={post.data.tocImage}
+  tocImageAlt={post.data.tocImageAlt}
+  previous={navigation.previous ? { title: navigation.previous.data.title, href: `/life/${post.data.section}/${navigation.previous.id}/` } : undefined}
+  next={navigation.next ? { title: navigation.next.data.title, href: `/life/${post.data.section}/${navigation.next.id}/` } : undefined}
+  currentPath={`/life/${post.data.section}/`}
+  eyebrow={`LIFE SPACE / ${sectionLabel.toUpperCase()}`}
+>
+  <Content />
+</PostLayout>
