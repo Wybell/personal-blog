@@ -1,0 +1,25 @@
+---
+import { projects } from "../site.config";
+
+interface Props {
+  project: (typeof projects)[number];
+}
+
+const { project } = Astro.props;
+---
+
+<a class="project-card" href={`/projects/${project.slug}/`}>
+  <div class="overview-card-header">
+    <span class="card-kicker">项目实践 · {project.category}</span>
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </div>
+  <h2>{project.name}</h2>
+  <p>{project.summary}</p>
+  <div class="chip-list compact-chip-list">
+    {project.stack.slice(0, 5).map((item) => <span>{item}</span>)}
+  </div>
+  <div class="project-card-meta">
+    <span>{project.role}</span>
+    <span>{project.status}</span>
+  </div>
+</a>

@@ -1,0 +1,22 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items?: readonly string[];
+}
+
+const { eyebrow, title, description, items = [] } = Astro.props;
+---
+
+<section class="placeholder-panel" aria-labelledby="placeholder-title">
+  <p class="card-kicker">{eyebrow}</p>
+  <h2 id="placeholder-title">{title}</h2>
+  <p>{description}</p>
+  {items.length > 0 && (
+    <div class="placeholder-list">
+      {items.map((item) => <span>{item}</span>)}
+    </div>
+  )}
+  <span class="placeholder-note">内容正在整理中，后续会逐步补充。</span>
+</section>

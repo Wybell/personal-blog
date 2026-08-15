@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  item: CollectionEntry<"media">;
+}
+
+const { item } = Astro.props;
+---
+
+<a class="media-card" href={`/life/media/${item.id}/`}>
+  <div class="media-card-visual">
+    {item.data.src ? (
+      item.data.type === "image" ? (
+        <img src={item.data.src} alt={item.data.title} loading="lazy" />
+      ) : (
+        <video src={item.data.src} poster={item.data.poster} muted playsinline preload="metadata" aria-label={item.data.title}></video>
+      )
+    ) : (
+      <div class="media-card-placeholder" aria-hidden="true">
+        <span>{item.data.type === "video" ? "VIDEO" : "IMAGE"}</span>
+      </div>
+    )}
+    <span class="media-card-type">{item.data.type === "video" ? "视频" : "照片"}</span>
+  </div>
+  <div class="media-card-body">
+    <div class="overview-card-header">
+      <span class="card-kicker">影像片段</span>
+      <span class="card-arrow" aria-hidden="true">↗</span>
+    </div>
+    <h2>{item.data.title}</h2>
+    <p>{item.data.description}</p>
+    <div class="thoughts-post-meta">
+      <time datetime={item.data.capturedDate.toISOString()}>{item.data.capturedDate.toLocaleDateString("zh-CN")}</time>
+      {item.data.location && <span>{item.data.location}</span>}
+    </div>
+  </div>
+</a>

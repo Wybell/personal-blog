@@ -1,0 +1,88 @@
+---
+import { projects, siteConfig } from "../site.config";
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+const technicalPaths = ["/technical/", "/projects/", "/posts/", "/experience/"];
+const isActive = (href: string) => {
+  if (href === "/") return currentPath === "/";
+  if (href === "/technical/") return technicalPaths.some((path) => currentPath.startsWith(path));
+  return currentPath.startsWith(href);
+};
+const isHome = currentPath === "/";
+---
+
+<header class:list={["masthead", { "masthead-home": isHome, "masthead-inner-page": !isHome }]}>
+  <div class="container masthead-inner">
+    {isHome ? (
+      <div class="profile-grid">
+        <section class="intro-card" aria-labelledby="site-intro-title">
+          <div class="intro-card-visual" aria-hidden="true">
+            <img src="/home-beach.png" alt="" />
+          </div>
+          <div class="card-kicker">
+            <span>PERSONAL SPACE</span>
+            <span class="kicker-dot" aria-hidden="true"></span>
+            <span>{siteConfig.location}</span>
+          </div>
+          <h1 id="site-intro-title">把做过的事写下来，<br />把还没想明白的问题留在路上。</h1>
+          <p class="intro-copy">代码是正在发生的事，记录是走过之后留下的痕迹。<br />不急着定义自己，先把一个个项目做好。</p>
+          <div class="intro-meta">
+            <span>{siteConfig.displayName}</span>
+            <span>{siteConfig.role}</span>
+            <span>{siteConfig.location}</span>
+          </div>
+        </section>
+
+        <aside class="identity-card" aria-label="个人资料">
+          <div class="identity-topline">
+            <div class="avatar-placeholder">
+              <img src="/avatar.jpg" alt="Wybell 的头像" />
+            </div>
+            <div>
+              <p class="identity-name">{siteConfig.displayName}</p>
+              <p class="identity-role">{siteConfig.role}</p>
+            </div>
+          </div>
+          <div class="identity-location">{siteConfig.location} · 正在记录</div>
+          <div class="profile-links">
+            {siteConfig.github ? (
+              <a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+            ) : (
+              <span class="disabled-link">GitHub 待补充</span>
+            )}
+            <a href={`mailto:${siteConfig.email}`}>邮箱 <span aria-hidden="true">↗</span></a>
+          </div>
+          <dl class="profile-stats">
+            <div><dt>项目</dt><dd>{String(projects.length).padStart(2, "0")}</dd></div>
+            <div><dt>文章</dt><dd>{siteConfig.stats.articles}</dd></div>
+            <div><dt>仓库</dt><dd>{siteConfig.stats.repositories}</dd></div>
+          </dl>
+        </aside>
+      </div>
+    ) : (
+      <div class="compact-profile">
+        <a class="compact-brand" href="/">{siteConfig.name}</a>
+        <span class="compact-divider" aria-hidden="true"></span>
+        <span>{siteConfig.role}</span>
+        <span>{siteConfig.location}</span>
+        <a class="compact-email" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+      </div>
+    )}
+  </div>
+</header>
+
+<div class="top-nav-shell">
+  <div class="container">
+    <nav class="top-nav" aria-label="一级导航">
+      {siteConfig.nav.map((item) => (
+        <a class:list={["top-nav-card", { active: isActive(item.href) }]} href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+          <span>{item.label}</span>
+        </a>
+      ))}
+    </nav>
+  </div>
+</div>

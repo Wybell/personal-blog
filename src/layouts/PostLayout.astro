@@ -1,0 +1,108 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { ArticleHeading } from "../lib/article";
+
+interface PostLink {
+  title: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  wordCount: number;
+  headings: ArticleHeading[];
+  cover?: string;
+  coverAlt?: string;
+  tocImage?: string;
+  tocImageAlt?: string;
+  previous?: PostLink;
+  next?: PostLink;
+  currentPath?: string;
+  eyebrow?: string;
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  wordCount,
+  headings,
+  cover,
+  coverAlt = title,
+  tocImage,
+  tocImageAlt = title,
+  previous,
+  next,
+  currentPath = "/technical/learning/",
+  eyebrow = "TECHNICAL NOTE",
+} = Astro.props;
+---
+
+<BaseLayout title={`${title} | Wybell`} description={description} currentPath={currentPath}>
+  <main class="container post-page-shell">
+    <article class="post-article">
+      <header class:list={["post-article-header", "post-title-card", { "has-cover": cover }]}>
+        <div class="post-title-card-content">
+          <p class="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+          <div class="post-meta-list" aria-label="文章信息">
+            <span>发表于 {pubDate.toLocaleDateString("zh-CN")}</span>
+            <span>更新于 {(updatedDate ?? pubDate).toLocaleDateString("zh-CN")}</span>
+            <span>{wordCount} 字</span>
+            <span>阅读量 <span id="busuanzi_value_page_pv">统计中</span></span>
+          </div>
+        </div>
+        {cover && <img class="post-title-card-media" src={cover} alt={coverAlt} />}
+      </header>
+
+      <div class="post-reading-layout">
+        <aside class="post-toc" aria-label="文章目录">
+          {tocImage && <img class="post-toc-image" src={tocImage} alt={tocImageAlt} />}
+          <p class="post-toc-title">目录</p>
+          {headings.length > 0 ? (
+            <nav>
+              {headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).map((heading) => (
+                <a class:list={["post-toc-link", `post-toc-depth-${heading.depth}`]} href={`#${heading.slug}`}>{heading.text}</a>
+              ))}
+            </nav>
+          ) : (
+            <p class="post-toc-empty">暂无小节</p>
+          )}
+        </aside>
+
+        <article class="post-content">
+          <slot />
+        </article>
+      </div>
+
+      <nav class="post-adjacent" aria-label="上一篇和下一篇">
+        {previous ? (
+          <a class="post-adjacent-link" href={previous.href}>
+            <span>上一篇</span>
+            <strong>{previous.title}</strong>
+          </a>
+        ) : (
+          <span class="post-adjacent-link is-disabled">
+            <span>上一篇</span>
+            <strong>暂无文章</strong>
+          </span>
+        )}
+        {next ? (
+          <a class="post-adjacent-link post-adjacent-next" href={next.href}>
+            <span>下一篇</span>
+            <strong>{next.title}</strong>
+          </a>
+        ) : (
+          <span class="post-adjacent-link post-adjacent-next is-disabled">
+            <span>下一篇</span>
+            <strong>暂无文章</strong>
+          </span>
+        )}
+      </nav>
+    </article>
+  </main>
+</BaseLayout>

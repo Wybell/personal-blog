@@ -1,0 +1,26 @@
+---
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  items: readonly NavItem[];
+  currentPath?: string;
+}
+
+const { items, currentPath = Astro.url.pathname } = Astro.props;
+const isActive = (href: string, index: number) => index === 0 ? currentPath === href : currentPath.startsWith(href);
+---
+
+<div class="section-nav-shell">
+  <div class="container">
+    <nav class="section-nav" aria-label="二级导航">
+      {items.map((item, index) => (
+        <a class:list={["section-nav-link", { active: isActive(item.href, index) }]} href={item.href} aria-current={isActive(item.href, index) ? "page" : undefined}>
+          <span>{item.label}</span>
+        </a>
+      ))}
+    </nav>
+  </div>
+</div>

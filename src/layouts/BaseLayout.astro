@@ -1,0 +1,63 @@
+---
+import "../styles/global.css";
+import { sectionNavigation, siteConfig } from "../site.config";
+import ProfileMasthead from "../components/ProfileMasthead.astro";
+import SectionNav from "../components/SectionNav.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPath?: string;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  currentPath = Astro.url.pathname,
+} = Astro.props;
+
+const navigationGroups = [
+  { prefixes: ["/technical/", "/projects/", "/posts/", "/experience/"], items: sectionNavigation.technical },
+  { prefixes: ["/life/"], items: sectionNavigation.life },
+  { prefixes: ["/thoughts/"], items: sectionNavigation.thoughts },
+  { prefixes: ["/about/"], items: sectionNavigation.about },
+];
+const activeSubnav = navigationGroups.find((group) => group.prefixes.some((prefix) => currentPath.startsWith(prefix)))?.items;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <ProfileMasthead currentPath={currentPath} />
+    {activeSubnav && <SectionNav items={activeSubnav} currentPath={currentPath} />}
+
+    <div class="page-shell">
+      <slot />
+    </div>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>© {new Date().getFullYear()} {siteConfig.name}. Built with Astro.</span>
+        <div class="footer-links">
+          {siteConfig.github && <a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub</a>}
+          <a href={`mailto:${siteConfig.email}`}>Email</a>
+        </div>
+      </div>
+    </footer>
+
+    {siteConfig.analytics.provider === "busuanzi" && (
+      <script is:inline async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    )}
+  </body>
+</html>
