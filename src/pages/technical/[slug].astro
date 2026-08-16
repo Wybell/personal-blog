@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ExperienceCard from "../../components/ExperienceCard.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import SubsectionHeader from "../../components/SubsectionHeader.astro";
 import TechnicalPostCard from "../../components/TechnicalPostCard.astro";
@@ -78,19 +79,8 @@ const updated = isArticleSection && posts[0] ? posts[0].data.pubDate.toLocaleDat
     )}
 
     {slug === "experience" && (
-      <section class="experience-list" aria-label="工作经历列表">
-        {experiences.map((experience) => (
-          <article class="experience-item">
-            <time class="experience-period">{experience.period}</time>
-            <div class="experience-content">
-              <span class="experience-marker" aria-hidden="true"></span>
-              <h2>{experience.title}</h2>
-              <p class="experience-organization">{experience.organization}</p>
-              <p>{experience.summary}</p>
-              <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
-            </div>
-          </article>
-        ))}
+      <section class="experience-card-grid" aria-label="工作经历列表">
+        {experiences.map((experience, index) => <ExperienceCard experience={experience} index={index + 1} />)}
       </section>
     )}
 

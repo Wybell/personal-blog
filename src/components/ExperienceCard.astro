@@ -1,0 +1,31 @@
+---
+import { experiences } from "../site.config";
+
+interface Props {
+  experience: (typeof experiences)[number];
+  index: number;
+}
+
+const { experience, index } = Astro.props;
+---
+
+<article class="experience-card">
+  <div class="experience-card-aside">
+    <span class="card-kicker">工作经历</span>
+    <time>{experience.period}</time>
+    <span class="experience-card-aside-label">TECHNICAL SPACE</span>
+  </div>
+  <div class="experience-card-content">
+    <div class="overview-card-header">
+      <span class="card-kicker">技术空间 · 工作经历</span>
+      <span class="experience-card-index">{String(index).padStart(2, "0")}</span>
+    </div>
+    <h2>{experience.title}</h2>
+    <p class="experience-card-organization">{experience.organization}</p>
+    <p class="experience-card-summary">{experience.summary}</p>
+    <div class="experience-card-details">
+      <span class="experience-card-details-label">参与内容</span>
+      <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
+    </div>
+  </div>
+</article>
