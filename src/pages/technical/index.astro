@@ -6,14 +6,16 @@ import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
 import { getTechnicalPosts } from "../../lib/technical";
 import { experiences, projects, sectionPageContent, skillGroups } from "../../site.config";
 
-const [learningPosts, practicePosts] = await Promise.all([
+const [learningPosts, practicePosts, experiencePosts] = await Promise.all([
   getTechnicalPosts("learning"),
   getTechnicalPosts("practice"),
+  getTechnicalPosts("experience"),
 ]);
 const latestPost = learningPosts[0];
 const latestPractice = practicePosts[0];
 const latestExperience = experiences[0];
-const technicalDates = [latestPost?.data.pubDate, latestPractice?.data.pubDate].filter((date): date is Date => Boolean(date));
+const latestExperiencePost = experiencePosts[0];
+const technicalDates = [latestPost?.data.pubDate, latestPractice?.data.pubDate, latestExperiencePost?.data.pubDate].filter((date): date is Date => Boolean(date));
 const latestTechnicalDate = technicalDates.sort((a, b) => b.valueOf() - a.valueOf())[0];
 const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
 const pageContent = sectionPageContent.technical;
@@ -78,7 +80,11 @@ const pageContent = sectionPageContent.technical;
         kicker="技术空间 · 工作经历"
         title={latestExperience.title}
         description={latestExperience.summary}
+        className="experience-directory-card"
         meta={`${latestExperience.organization} · ${latestExperience.period}`}
+        cover={latestExperiencePost?.data.cover}
+        coverAlt={latestExperiencePost?.data.coverAlt}
+        recentPosts={experiencePosts.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) }))}
       />
     </section>
   </main>
