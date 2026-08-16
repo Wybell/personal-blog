@@ -2,8 +2,11 @@
 title: "AI 面试助手的工程化实践：从一次模型调用到可部署的面试训练闭环"
 description: "详细记录 AI 面试助手的业务建模、AI 多模型路由、专题知识库、简历生命周期、模拟面试状态机、SSE 评分、安全、数据库迁移、Docker 部署和 CI/CD 实践。"
 pubDate: 2026-08-14
+updatedDate: 2026-08-16
 section: project
 projectSlug: ai-interview-assistant
+cover: /project-ai-lake.png
+coverAlt: "AI 面试助手项目封面"
 tags:
   - AI 应用
   - Spring Boot

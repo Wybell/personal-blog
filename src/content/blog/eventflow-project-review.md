@@ -2,8 +2,11 @@
 title: "EventFlow 技术复盘：从活动报名业务到可交付的工程系统"
 description: "以 EventFlow 为例，完整拆解活动状态机、多场次配额、MySQL 条件更新防超卖、JWT 令牌轮换、前端缓存一致性、容器部署和 CI/CD 中的真实实现与踩坑。"
 pubDate: 2026-08-14
+updatedDate: 2026-08-16
 section: project
 projectSlug: eventflow
+cover: /project-eventflow.png
+coverAlt: "EventFlow 活动报名系统项目封面"
 tags:
   - EventFlow
   - Spring Boot
