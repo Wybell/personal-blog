@@ -1,15 +1,15 @@
 ---
 import { experiences } from "../site.config";
+import ArrowUpRight from "./ArrowUpRight.astro";
 
 interface Props {
   experience: (typeof experiences)[number];
-  index: number;
 }
 
-const { experience, index } = Astro.props;
+const { experience } = Astro.props;
 ---
 
-<article class="experience-card">
+<a class="experience-card" href="/posts/experience-java-internship/">
   <div class="experience-card-aside">
     <span class="card-kicker">工作经历</span>
     <time>{experience.period}</time>
@@ -18,7 +18,7 @@ const { experience, index } = Astro.props;
   <div class="experience-card-content">
     <div class="overview-card-header">
       <span class="card-kicker">技术空间 · 工作经历</span>
-      <span class="experience-card-index">{String(index).padStart(2, "0")}</span>
+      <ArrowUpRight />
     </div>
     <h2>{experience.title}</h2>
     <p class="experience-card-organization">{experience.organization}</p>
@@ -28,4 +28,4 @@ const { experience, index } = Astro.props;
       <ul>{experience.details.map((detail) => <li>{detail}</li>)}</ul>
     </div>
   </div>
-</article>
+</a>

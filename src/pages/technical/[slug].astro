@@ -80,7 +80,7 @@ const updated = isArticleSection && posts[0] ? posts[0].data.pubDate.toLocaleDat
 
     {slug === "experience" && (
       <section class="experience-card-grid" aria-label="工作经历列表">
-        {experiences.map((experience, index) => <ExperienceCard experience={experience} index={index + 1} />)}
+        {experiences.map((experience) => <ExperienceCard experience={experience} />)}
       </section>
     )}
 

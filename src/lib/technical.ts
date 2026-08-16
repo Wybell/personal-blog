@@ -5,6 +5,7 @@ export const TECHNICAL_POSTS_PER_PAGE = 10;
 export const technicalSectionLabels = {
   learning: "技术学习",
   practice: "工程实践",
+  experience: "工作经历",
 } as const;
 
 export async function getTechnicalPosts(section: string) {

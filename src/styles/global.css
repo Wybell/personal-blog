@@ -4397,6 +4397,8 @@ body {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
+  color: inherit;
+  text-decoration: none;
   transition: border-color 180ms ease, transform 180ms ease, background-color 180ms ease;
 }
 
@@ -4404,6 +4406,11 @@ body {
   border-color: color-mix(in srgb, var(--section-accent) 58%, var(--line));
   background: var(--surface);
   transform: translateY(-2px);
+}
+
+.experience-card:focus-visible {
+  outline: 2px solid var(--section-accent);
+  outline-offset: 4px;
 }
 
 .experience-card-aside {
@@ -4443,12 +4450,6 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-}
-
-.experience-card-index {
-  color: var(--section-accent);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.68rem;
 }
 
 .experience-card h2 {

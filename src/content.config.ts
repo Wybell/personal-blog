@@ -8,7 +8,7 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    section: z.enum(["learning", "practice", "project"]).default("learning"),
+    section: z.enum(["learning", "practice", "project", "experience"]).default("learning"),
     projectSlug: z.string().optional(),
     cover: z.string().optional(),
     coverAlt: z.string().optional(),

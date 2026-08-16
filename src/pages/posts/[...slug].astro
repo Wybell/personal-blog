@@ -15,6 +15,8 @@ const { post } = Astro.props;
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const navigation = getArticleNavigation(allPosts, post.id);
 const { Content, headings } = await render(post);
+const sectionPath = post.data.section === "experience" ? "/technical/experience/" : post.data.section === "practice" ? "/technical/practice/" : "/technical/learning/";
+const sectionEyebrow = post.data.section === "experience" ? "TECHNICAL SPACE / EXPERIENCE" : post.data.section === "practice" ? "TECHNICAL SPACE / PRACTICE" : "TECHNICAL SPACE / LEARNING";
 ---
 
 <PostLayout
@@ -30,6 +32,8 @@ const { Content, headings } = await render(post);
   tocImageAlt={post.data.tocImageAlt}
   previous={navigation.previous ? { title: navigation.previous.data.title, href: `/posts/${navigation.previous.id}/` } : undefined}
   next={navigation.next ? { title: navigation.next.data.title, href: `/posts/${navigation.next.id}/` } : undefined}
+  currentPath={sectionPath}
+  eyebrow={sectionEyebrow}
 >
   <Content />
 </PostLayout>
