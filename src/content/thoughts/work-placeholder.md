@@ -3,6 +3,8 @@ title: "只要方向是对的，慢一点也没关系"
 description: "从卡住、排查、联调到上线，记录一段 Java 全栈实习里的工作感受。"
 pubDate: 2026-08-16
 section: work
+cover: /cover-work.png
+coverAlt: "夜空、云层与远方星球的景象"
 tags:
   - 实习
   - 工作方法

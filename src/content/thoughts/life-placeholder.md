@@ -3,6 +3,8 @@ title: "只知道要先走到下一站"
 description: "关于实习期间的通勤、宿舍、城市和那些被记下来的生活碎片。"
 pubDate: 2026-08-16
 section: life
+cover: /cover-life.png
+coverAlt: "空中飘落的樱花花瓣"
 tags:
   - 实习生活
   - 通勤
