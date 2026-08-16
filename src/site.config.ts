@@ -1,3 +1,15 @@
+import { execFileSync } from "node:child_process";
+
+function getSiteUpdateCount() {
+  try {
+    const output = execFileSync("git", ["rev-list", "--count", "HEAD"], { encoding: "utf8" }).trim();
+    const count = Number.parseInt(output, 10);
+    return Number.isFinite(count) ? count : 0;
+  } catch {
+    return 0;
+  }
+}
+
 export const siteConfig = {
   name: "Wybell空间",
   displayName: "Wybell",
@@ -6,6 +18,7 @@ export const siteConfig = {
   description: "记录项目、学习、工作与生活，把做过的事写下来，把还没想明白的问题留在路上。",
   url: "https://your-domain.example",
   establishedDate: "2026-08-13",
+  updateCount: getSiteUpdateCount(),
   location: "广州",
   email: "2458262576@qq.com",
   github: "https://github.com/Wybell",

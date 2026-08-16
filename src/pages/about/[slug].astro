@@ -32,7 +32,7 @@ const subsectionCounts = {
   experience: "01 段经历",
   status: "持续更新",
   contact: "06 个入口",
-  site: "04 项信息",
+  site: "05 项信息",
 } as const;
 ---
 
@@ -128,6 +128,7 @@ const subsectionCounts = {
         <dl class="about-fact-list site-fact-list">
           <div><dt>建立时间</dt><dd>{establishedDateLabel}</dd></div>
           <div><dt>已经运行</dt><dd><span data-site-age data-established={siteConfig.establishedDate}>{initialSiteAge}</span></dd></div>
+          <div><dt>更新次数</dt><dd>{siteConfig.updateCount} 次</dd></div>
           <div><dt>生成方式</dt><dd>Astro · 静态站点</dd></div>
         </dl>
         <ul class="about-inline-list">
