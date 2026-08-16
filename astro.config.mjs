@@ -4,4 +4,9 @@ import { siteConfig } from "./src/site.config";
 
 export default defineConfig({
   site: siteConfig.url,
+  markdown: {
+    shikiConfig: {
+      theme: "github-light",
+    },
+  },
 });
