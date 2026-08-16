@@ -295,6 +295,8 @@ export const experiences = [
     title: "Java 全栈实习生",
     organization: "广州平云信息技术有限公司",
     summary: "参与企业级组织管理平台开发，完成需求、缺陷、联调、测试和上线的完整工作流。",
+    cover: "/cover-experience.png",
+    coverAlt: "平云科技公司标志",
     details: [
       "累计完成 73 个经过测试并上线的工单，其中包括 41 个需求和 32 个缺陷",
       "参与审批、待办、组织权限、费用导入、文件下载和前后端联调等工作",
