@@ -22,11 +22,6 @@ const thoughtSections = [
 const latestThought = [...learning, ...work, ...life, ...retrospective].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
 const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
 const pageContent = sectionPageContent.thoughts;
-const orderedThoughtSections = [...thoughtSections].sort((a, b) => {
-  if (a.slug === latestThought?.data.section) return -1;
-  if (b.slug === latestThought?.data.section) return 1;
-  return 0;
-});
 ---
 
 <BaseLayout title="随想录 | Wybell" description="Wybell 对学习、工作和生活的一些记录与思考。" currentPath="/thoughts/">
@@ -43,7 +38,7 @@ const orderedThoughtSections = [...thoughtSections].sort((a, b) => {
     />
 
     <section class="section-directory-grid" aria-label="随想录最新内容">
-      {orderedThoughtSections.map((section) => {
+      {thoughtSections.map((section) => {
         const post = section.posts[0];
         return (
           <SectionDirectoryCard
