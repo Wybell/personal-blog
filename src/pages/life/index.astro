@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getLifeMedia, getLifePosts } from "../../lib/life";
+import ArrowUpRight from "../../components/ArrowUpRight.astro";
+import SectionDirectoryCard from "../../components/SectionDirectoryCard.astro";
+import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
+import { getLifeMedia, getLifePosts, lifeSectionLabels } from "../../lib/life";
+import { sectionPageContent } from "../../site.config";
 
 const [daily, travel, hobbies, reading, media] = await Promise.all([
   getLifePosts("daily"),
@@ -10,65 +14,95 @@ const [daily, travel, hobbies, reading, media] = await Promise.all([
   getLifeMedia(),
 ]);
 
+const allLifePosts = [...daily, ...travel, ...hobbies, ...reading].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const latestLifePost = allLifePosts[0];
+const latestMedia = media[0];
+const latestLifeDate = latestLifePost?.data.pubDate ?? latestMedia?.data.capturedDate;
+const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
+const pageContent = sectionPageContent.life;
+
 const lifePreviews = [
   {
-    href: daily[0] ? `/life/daily/${daily[0].id}/` : "/life/daily/",
+    href: "/life/daily/",
     region: "生活空间 · 日常记录",
-    title: daily[0]?.data.title ?? "最新日常记录",
-    description: daily[0]?.data.description ?? "最近发生的一件小事、一段普通但值得留下来的日子。",
+    title: "日常记录",
+    description: "最近发生的一件小事、一段普通但值得留下来的日子。",
     placeholder: daily[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
-    featured: true,
+    cover: daily[0]?.data.cover,
+    coverAlt: daily[0]?.data.coverAlt,
+    recentPosts: daily.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) })),
   },
   {
-    href: travel[0] ? `/life/travel/${travel[0].id}/` : "/life/travel/",
+    href: "/life/travel/",
     region: "生活空间 · 旅行见闻",
-    title: travel[0]?.data.title ?? "最新旅行见闻",
-    description: travel[0]?.data.description ?? "去过的地方，以及沿途看到、听到和记住的片段。",
+    title: "旅行见闻",
+    description: "去过的地方，以及沿途看到、听到和记住的片段。",
     placeholder: travel[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+    cover: travel[0]?.data.cover,
+    coverAlt: travel[0]?.data.coverAlt,
+    recentPosts: travel.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) })),
   },
   {
-    href: hobbies[0] ? `/life/hobbies/${hobbies[0].id}/` : "/life/hobbies/",
-    region: "生活空间 · 兴趣爱好",
-    title: hobbies[0]?.data.title ?? "最近在做的事",
-    description: hobbies[0]?.data.description ?? "工作和学习之外，正在慢慢形成的兴趣。",
-    placeholder: hobbies[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
-  },
-  {
-    href: media[0] ? `/life/media/${media[0].id}/` : "/life/media/",
+    href: "/life/media/",
     region: "生活空间 · 影像片段",
-    title: media[0]?.data.title ?? "最新影像片段",
-    description: media[0]?.data.description ?? "照片、短视频和之后准备放进这里的动态素材。",
+    title: "影像片段",
+    description: "照片、短视频和之后准备放进这里的动态素材。",
     placeholder: media[0]?.data.capturedDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+    cover: media[0]?.data.poster,
+    coverAlt: media[0]?.data.title,
+    recentPosts: media.slice(0, 3).map((item) => ({ title: item.data.title, meta: formatDate(item.data.capturedDate) })),
   },
   {
-    href: reading[0] ? `/life/reading/${reading[0].id}/` : "/life/reading/",
+    href: "/life/reading/",
     region: "生活空间 · 阅读观影",
-    title: reading[0]?.data.title ?? "最近读到或看到的内容",
-    description: reading[0]?.data.description ?? "读过的书、看过的电影，以及留下来的片刻感受。",
+    title: "阅读观影",
+    description: "读过的书、看过的电影，以及留下来的片刻感受。",
     placeholder: reading[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+    cover: reading[0]?.data.cover,
+    coverAlt: reading[0]?.data.coverAlt,
+    recentPosts: reading.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) })),
   },
 ];
 ---
 
 <BaseLayout title="生活空间 | Wybell" description="Wybell 的日常、兴趣、见闻与生活记录。" currentPath="/life/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">LIFE SPACE</p>
-      <h1>生活空间</h1>
-      <p>不只记录完成了什么，也留一点位置给日常、兴趣和那些正在发生的小事。</p>
-    </header>
+    <SectionIndexHeader
+      eyebrow={pageContent.eyebrow}
+      title={pageContent.title}
+      description={pageContent.description}
+      stats={[
+        { label: "内容分区", value: "05" },
+        { label: "公开记录", value: String(allLifePosts.length + media.length).padStart(2, "0") },
+        { label: "最近更新", value: formatDate(latestLifeDate) },
+      ]}
+    />
 
-    <section class="space-card-grid" aria-label="生活空间最新内容">
+    <a class:list={["section-feature-card", { "without-cover": !latestLifePost?.data.cover }]} href={latestLifePost ? `/life/${latestLifePost.data.section}/${latestLifePost.id}/` : "/life/daily/"}>
+      <div class="section-feature-card-content">
+        <div class="overview-card-header">
+          <span class="card-kicker">{latestLifePost ? `生活空间 · ${lifeSectionLabels[latestLifePost.data.section]}` : "生活空间 · 最新记录"}</span>
+          <ArrowUpRight />
+        </div>
+        <h2>{latestLifePost?.data.title ?? "生活记录"}</h2>
+        <p>{latestLifePost?.data.description ?? "为日常、兴趣和正在发生的小事留一个可以慢慢填充的位置。"}</p>
+        <span class="section-feature-card-meta">{formatDate(latestLifeDate)}</span>
+      </div>
+      {latestLifePost?.data.cover && <img class="section-feature-card-cover" src={latestLifePost.data.cover} alt={latestLifePost.data.coverAlt ?? `${latestLifePost.data.title} 封面`} loading="eager" />}
+    </a>
+
+    <section class="section-directory-grid" aria-label="生活空间内容">
       {lifePreviews.map((preview) => (
-        <a class:list={["space-card", { "space-card-featured": preview.featured }]} href={preview.href}>
-          <div class="overview-card-header">
-            <span class="card-kicker">{preview.region}</span>
-            <span class="card-arrow" aria-hidden="true">↗</span>
-          </div>
-          <h2>{preview.title}</h2>
-          <p>{preview.description}</p>
-          <span class="card-placeholder">{preview.placeholder}</span>
-        </a>
+        <SectionDirectoryCard
+          href={preview.href}
+          kicker={preview.region}
+          title={preview.title}
+          description={preview.description}
+          meta={preview.recentPosts.length ? undefined : preview.placeholder}
+          cover={preview.cover}
+          coverAlt={preview.coverAlt}
+          recentPosts={preview.recentPosts}
+        />
       ))}
     </section>
   </main>

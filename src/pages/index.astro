@@ -1,51 +1,120 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ArrowUpRight from "../components/ArrowUpRight.astro";
+import IdentityCard from "../components/IdentityCard.astro";
+import { getLifePosts } from "../lib/life";
 import { getTechnicalPosts } from "../lib/technical";
-import { projects, skillGroups } from "../site.config";
+import { getThoughtPosts } from "../lib/thoughts";
+import { homeSkillGroups, projects } from "../site.config";
 
-const [learningPosts, practicePosts] = await Promise.all([
+const [learningPosts, practicePosts, hobbyPosts, thoughtPosts] = await Promise.all([
   getTechnicalPosts("learning"),
   getTechnicalPosts("practice"),
+  getLifePosts("hobbies"),
+  getThoughtPosts("retrospective"),
 ]);
-const latestPost = learningPosts[0];
-const latestPractice = practicePosts[0];
+const articleCarousels = [
+  {
+    key: "learning",
+    label: "技术学习",
+    posts: learningPosts.slice(0, 3),
+    fallbackHref: "/technical/learning/",
+    fallbackTitle: "最近技术学习",
+    fallbackDescription: "技术学习记录正在整理中。",
+  },
+  {
+    key: "practice",
+    label: "工程实践",
+    posts: practicePosts.slice(0, 3),
+    fallbackHref: "/technical/practice/",
+    fallbackTitle: "最近工程实践",
+    fallbackDescription: "权限、事务、数据一致性、部署和持续交付等问题，会在这里逐步整理成文章。",
+  },
+] as const;
+const personalCarousels = [
+  {
+    key: "hobbies",
+    label: "兴趣爱好",
+    posts: hobbyPosts.slice(0, 3),
+    fallbackHref: "/life/hobbies/",
+    fallbackTitle: "兴趣爱好",
+    fallbackDescription: "记录那些愿意持续投入的兴趣，以及工作和学习之外留下来的小片段。",
+  },
+  {
+    key: "retrospective",
+    label: "随笔灵思",
+    posts: thoughtPosts.slice(0, 3),
+    fallbackHref: "/thoughts/retrospective/",
+    fallbackTitle: "随笔灵思",
+    fallbackDescription: "阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。",
+  },
+] as const;
 
 const featuredProjects = projects.filter((project) => ["ai-interview-assistant", "eventflow"].includes(project.slug));
 ---
 
 <BaseLayout currentPath="/">
   <main class="container home-main">
-    <section class="project-showcase" aria-label="精选项目">
-      {featuredProjects.map((project) => {
-        const destination = project.live || `/projects/${project.slug}/`;
-        const isExternal = Boolean(project.live);
-        const projectVisual = project.slug === "eventflow" ? "/project-eventflow.png" : "/project-ai.png";
-        return (
-          <a class:list={["project-link-card", project.slug === "eventflow" ? "project-link-eventflow" : "project-link-ai"]} href={destination} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
-            <div class="project-link-topline">
-              <span class="card-kicker">{project.slug === "eventflow" ? "EVENTFLOW" : "AI INTERVIEW"}</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-            <h2>{project.name}</h2>
-            <p>{project.slug === "eventflow" ? "活动报名与配额管理系统，直接进入报名系统。" : "从简历处理到模拟面试与反馈报告的求职应用。"}</p>
-            <span class="project-link-status">{isExternal ? "进入在线系统" : "项目地址待补充 · 先查看项目"}</span>
-            <img class="project-link-thumb" src={projectVisual} alt="" aria-hidden="true" loading="lazy" />
-          </a>
-        );
-      })}
+    <section class="home-feature-layout" aria-label="精选内容">
+      <div class="home-project-column">
+        <section class="project-showcase" aria-label="精选项目">
+          {featuredProjects.map((project, index) => {
+            const destination = project.live || `/projects/${project.slug}/`;
+            const isExternal = Boolean(project.live);
+            const projectVisual = project.slug === "eventflow" ? "/project-eventflow.png" : "/project-ai-lake.png";
+            return (
+              <article class:list={["project-link-card", index === 0 ? "project-link-featured" : "project-link-secondary", project.slug === "eventflow" ? "project-link-eventflow" : "project-link-ai", { "has-github": Boolean(project.github) }]}>
+                <a class="project-link-card-main" href={destination} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
+                  <img class="project-link-thumb" src={projectVisual} alt="" aria-hidden="true" loading="lazy" />
+                  <div class="project-link-content">
+                    <div class="project-link-topline">
+                      <span class="card-kicker">{project.slug === "eventflow" ? "EVENTFLOW" : "AI INTERVIEW"}</span>
+                      <ArrowUpRight />
+                    </div>
+                    <h2>{project.name}</h2>
+                    <p>{project.slug === "eventflow" ? "活动报名与预约管理系统，支持活动创建、场次配置、在线报名与取消，保障报名流程稳定可靠。" : "智能面试训练平台，支持三种出题方式、多模型切换、简历模拟面试，以及评分和复盘建议。"}</p>
+                    <span class="project-link-status">{isExternal ? "进入在线系统" : "项目地址待补充 · 先查看项目"}</span>
+                  </div>
+                </a>
+                {project.github ? (
+                  <a class="project-github-link" href={project.github} target="_blank" rel="noreferrer" aria-label={`打开 ${project.name} GitHub 仓库`}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.17c-3.22.7-3.9-1.55-3.9-1.55-.53-1.35-1.3-1.71-1.3-1.71-1.06-.73.08-.72.08-.72 1.17.08 1.79 1.2 1.79 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.75.41-1.27.74-1.56-2.57-.29-5.27-1.29-5.27-5.73 0-1.27.45-2.3 1.2-3.11-.12-.29-.52-1.47.11-3.07 0 0 .98-.31 3.2 1.19a11.1 11.1 0 0 1 5.82 0c2.22-1.5 3.2-1.19 3.2-1.19.63 1.6.23 2.78.11 3.07.75.81 1.2 1.84 1.2 3.11 0 4.45-2.71 5.44-5.29 5.73.42.36.79 1.08.79 2.18v3.23c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5Z" /></svg>
+                    <span>GitHub 仓库</span>
+                  </a>
+                ) : (
+                  <span class="project-github-link is-disabled" aria-label={`${project.name} GitHub 仓库待补充`}>GitHub 仓库待补充</span>
+                )}
+              </article>
+            );
+          })}
+        </section>
+      </div>
+
+      <aside class="home-sidebar" aria-label="个人信息">
+        <IdentityCard />
+      </aside>
     </section>
+
+    <a class="now-card status-card home-status-banner" href="/about/status/" aria-labelledby="now-title">
+      <div>
+        <p class="card-kicker">关于我 · 目前状态</p>
+        <h2 id="now-title">目前状态</h2>
+      </div>
+      <p>目前正在准备秋招，集中复习 Java 后端基础、算法和面试八股；同时复盘实习中的 73 个上线工单，深入整理 AI 面试助手和 EventFlow 的实现细节，并把这些内容持续写进个人博客。</p>
+      <ArrowUpRight />
+    </a>
 
     <section class="technical-home" aria-label="技术空间最新内容">
       <div class="technical-home-grid">
         <a class="technical-feature-card technical-stack-card" href="/technical/stack/">
           <div class="overview-card-header">
             <span class="card-kicker">技术空间 · 技术栈</span>
-            <span class="card-arrow" aria-hidden="true">↗</span>
+            <ArrowUpRight />
           </div>
           <h3>当前技术栈</h3>
           <p>按实际接触过的项目方向整理，不代表熟练度排序。</p>
           <div class="stack-overview-grid">
-            {skillGroups.map((group) => (
+            {homeSkillGroups.map((group) => (
               <div class="stack-overview-group">
                 <span class="stack-overview-label">{group.label}</span>
                 <div class="stack-overview-items">
@@ -57,58 +126,251 @@ const featuredProjects = projects.filter((project) => ["ai-interview-assistant",
         </a>
 
         <div class="technical-mini-grid" aria-label="技术内容预览">
-          <a class="technical-mini-card technical-learning-card" href={latestPost ? `/posts/${latestPost.id}/` : "/technical/learning/"}>
-            <div class="overview-card-header">
-              <span class="card-kicker">技术空间 · 技术学习</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
+          {articleCarousels.map((carousel) => (
+            <div class="homepage-article-carousel" data-article-carousel aria-label={`${carousel.label}最新文章`}>
+              <div class="homepage-article-track" data-article-track>
+                {carousel.posts.length > 0 ? carousel.posts.map((post, index) => (
+                  <a
+                    class:list={["technical-mini-card", "homepage-article-slide", carousel.key === "learning" ? "technical-learning-card" : "technical-practice-card", { "has-cover": Boolean(post.data.cover), "is-active": index === 0 }]}
+                    data-article-slide
+                    href={`/posts/${post.id}/`}
+                    aria-hidden={index === 0 ? undefined : "true"}
+                    tabindex={index === 0 ? undefined : "-1"}
+                  >
+                    {post.data.cover && <img class="technical-mini-cover" src={post.data.cover} alt={post.data.coverAlt ?? `${post.data.title} 封面`} loading={index === 0 ? "eager" : "lazy"} decoding="async" />}
+                    <div class="overview-card-header">
+                      <span class="card-kicker">技术空间 · {carousel.label}</span>
+                      <ArrowUpRight />
+                    </div>
+                    <h3>{post.data.title}</h3>
+                    <p>{post.data.description}</p>
+                    <span class="technical-card-meta">{post.data.pubDate.toLocaleDateString("zh-CN")}</span>
+                  </a>
+                )) : (
+                  <a class="technical-mini-card homepage-article-slide is-active" href={carousel.fallbackHref}>
+                    <div class="overview-card-header">
+                      <span class="card-kicker">技术空间 · {carousel.label}</span>
+                      <ArrowUpRight />
+                    </div>
+                    <h3>{carousel.fallbackTitle}</h3>
+                    <p>{carousel.fallbackDescription}</p>
+                    <span class="technical-card-meta">内容待补充</span>
+                  </a>
+                )}
+              </div>
+              {carousel.posts.length > 1 && (
+                <div class="homepage-article-pagination" aria-label={`${carousel.label}文章切换`}>
+                  {carousel.posts.map((post, index) => (
+                    <button
+                      type="button"
+                      class:list={["homepage-article-dot", { "is-active": index === 0 }]}
+                      data-article-dot
+                      data-slide-to={index}
+                      aria-label={`查看第 ${index + 1} 篇：${post.data.title}`}
+                      aria-current={index === 0 ? "true" : undefined}
+                    ></button>
+                  ))}
+                </div>
+              )}
             </div>
-            <h3>{latestPost ? latestPost.data.title : "最近技术记录"}</h3>
-            <p>{latestPost ? latestPost.data.description : "技术学习记录正在整理中。"}</p>
-            <span class="technical-card-meta">{latestPost ? latestPost.data.pubDate.toLocaleDateString("zh-CN") : "内容待补充"}</span>
-          </a>
-
-          <a class="technical-mini-card technical-practice-card" href={latestPractice ? `/posts/${latestPractice.id}/` : "/technical/practice/"}>
-            <div class="overview-card-header">
-              <span class="card-kicker">技术空间 · 工程实践</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-            <h3>{latestPractice ? latestPractice.data.title : "工程实践记录"}</h3>
-            <p>{latestPractice ? latestPractice.data.description : "权限、事务、数据一致性、部署和持续交付等问题，会在这里逐步整理成文章。"}</p>
-            <span class="technical-card-meta">{latestPractice ? latestPractice.data.pubDate.toLocaleDateString("zh-CN") : "内容待补充"}</span>
-          </a>
+          ))}
         </div>
       </div>
     </section>
 
-    <a class="now-card status-card" href="/about/status/" aria-labelledby="now-title">
-      <div>
-        <p class="card-kicker">关于我 · 目前状态</p>
-        <h2 id="now-title">目前状态</h2>
-      </div>
-      <p>实习已经完成，两个个人项目已部署；现在继续准备秋招，补齐 Java 后端基础，并把做过的功能整理成可复盘的记录。</p>
-      <span class="card-arrow" aria-hidden="true">↗</span>
-    </a>
-
     <section class="personal-preview-grid" aria-label="生活与随想最新内容">
-      <a class="overview-card personal-preview-card hobbies-card" href="/life/hobbies/">
-        <div class="overview-card-header">
-          <span class="card-kicker">生活空间 · 兴趣爱好</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
+      {personalCarousels.map((carousel) => (
+        <div class="homepage-article-carousel personal-preview-carousel" data-article-carousel aria-label={`${carousel.label}最新内容`}>
+          <div class="homepage-article-track" data-article-track>
+            {carousel.posts.length > 0 ? carousel.posts.map((post, index) => (
+              <a
+                class:list={["overview-card", "personal-preview-card", "homepage-article-slide", carousel.key === "hobbies" ? "hobbies-card" : "thoughts-card", { "has-cover": Boolean(post.data.cover), "is-active": index === 0 }]}
+                data-article-slide
+                href={`/${carousel.key === "hobbies" ? "life/hobbies" : "thoughts/retrospective"}/${post.id}/`}
+                aria-hidden={index === 0 ? undefined : "true"}
+                tabindex={index === 0 ? undefined : "-1"}
+              >
+                {post.data.cover && <img class="personal-preview-cover" src={post.data.cover} alt={post.data.coverAlt ?? `${post.data.title} 封面`} loading={index === 0 ? "eager" : "lazy"} decoding="async" />}
+                <div class="overview-card-header">
+                  <span class="card-kicker">{carousel.key === "hobbies" ? "生活空间" : "随想录"} · {carousel.label}</span>
+                  <ArrowUpRight />
+                </div>
+                <h2>{post.data.title}</h2>
+                <p>{post.data.description}</p>
+                <span class="card-placeholder">{post.data.pubDate.toLocaleDateString("zh-CN")}</span>
+              </a>
+            )) : (
+              <a class:list={["overview-card", "personal-preview-card", "homepage-article-slide", carousel.key === "hobbies" ? "hobbies-card" : "thoughts-card", "is-active"]} href={carousel.fallbackHref}>
+                <div class="overview-card-header">
+                  <span class="card-kicker">{carousel.key === "hobbies" ? "生活空间" : "随想录"} · {carousel.label}</span>
+                  <ArrowUpRight />
+                </div>
+                <h2>{carousel.fallbackTitle}</h2>
+                <p>{carousel.fallbackDescription}</p>
+                <span class="card-placeholder">最新内容待补充</span>
+              </a>
+            )}
+          </div>
+          {carousel.posts.length > 1 && (
+            <div class="homepage-article-pagination" aria-label={`${carousel.label}内容切换`}>
+              {carousel.posts.map((post, index) => (
+                <button
+                  type="button"
+                  class:list={["homepage-article-dot", { "is-active": index === 0 }]}
+                  data-article-dot
+                  data-slide-to={index}
+                  aria-label={`查看第 ${index + 1} 篇：${post.data.title}`}
+                  aria-current={index === 0 ? "true" : undefined}
+                ></button>
+              ))}
+            </div>
+          )}
         </div>
-        <h2>兴趣爱好</h2>
-        <p>记录那些愿意持续投入的兴趣，以及工作和学习之外留下来的小片段。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
-
-      <a class="overview-card personal-preview-card thoughts-card" href="/thoughts/retrospective/">
-        <div class="overview-card-header">
-          <span class="card-kicker">随想录 · 随笔灵思</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
-        </div>
-        <h2>随笔灵思</h2>
-        <p>阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
+      ))}
     </section>
   </main>
 </BaseLayout>
+
+<script>
+  const carousels = document.querySelectorAll("[data-article-carousel]");
+
+  carousels.forEach((carousel, carouselIndex) => {
+    const track = carousel.querySelector("[data-article-track]");
+    const slides = Array.from(carousel.querySelectorAll("[data-article-slide]"));
+    const dots = Array.from(carousel.querySelectorAll("[data-article-dot]"));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const autoplayDelay = 5000 + carouselIndex * 1200;
+    const initialOffset = carouselIndex * 700;
+
+    if (!track || slides.length < 2) {
+      return;
+    }
+
+    let activeIndex = 0;
+    let direction = 1;
+    let timerId;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let pointerActive = false;
+    let suppressClick = false;
+
+    const setActive = (nextIndex) => {
+      activeIndex = nextIndex;
+      track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
+
+      slides.forEach((slide, index) => {
+        const isActive = index === activeIndex;
+        slide.classList.toggle("is-active", isActive);
+        if (isActive) {
+          slide.removeAttribute("aria-hidden");
+          slide.removeAttribute("tabindex");
+        } else {
+          slide.setAttribute("aria-hidden", "true");
+          slide.setAttribute("tabindex", "-1");
+        }
+      });
+
+      dots.forEach((dot, index) => {
+        const isActive = index === activeIndex;
+        dot.classList.toggle("is-active", isActive);
+        if (isActive) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
+      });
+    };
+
+    const resetTimer = () => {
+      if (reduceMotion) {
+        return;
+      }
+      window.clearTimeout(timerId);
+      window.clearInterval(timerId);
+      timerId = window.setTimeout(() => {
+        advance();
+        timerId = window.setInterval(advance, autoplayDelay);
+      }, autoplayDelay);
+    };
+
+    const moveBy = (step) => {
+      let nextIndex = activeIndex + step;
+      if (nextIndex < 0 || nextIndex >= slides.length) {
+        step *= -1;
+        nextIndex = activeIndex + step;
+      }
+      direction = step > 0 ? 1 : -1;
+      setActive(nextIndex);
+      resetTimer();
+    };
+
+    const advance = () => {
+      let nextIndex = activeIndex + direction;
+      if (nextIndex < 0 || nextIndex >= slides.length) {
+        direction *= -1;
+        nextIndex = activeIndex + direction;
+      }
+      setActive(nextIndex);
+    };
+
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        const nextIndex = Number(dot.dataset.slideTo);
+        if (Number.isNaN(nextIndex) || nextIndex === activeIndex) {
+          return;
+        }
+        direction = nextIndex > activeIndex ? 1 : -1;
+        setActive(nextIndex);
+        resetTimer();
+      });
+    });
+
+    carousel.addEventListener("pointerdown", (event) => {
+      if (event.button !== undefined && event.button !== 0) {
+        return;
+      }
+      if (event.target instanceof Element && event.target.closest("[data-article-dot]")) {
+        return;
+      }
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+      pointerActive = true;
+      suppressClick = false;
+    });
+
+    carousel.addEventListener("pointerup", (event) => {
+      if (!pointerActive) {
+        return;
+      }
+      pointerActive = false;
+      const deltaX = event.clientX - pointerStartX;
+      const deltaY = event.clientY - pointerStartY;
+      if (Math.abs(deltaX) < 36 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+        return;
+      }
+      suppressClick = true;
+      moveBy(deltaX < 0 ? 1 : -1);
+      window.setTimeout(() => {
+        suppressClick = false;
+      }, 400);
+    });
+
+    carousel.addEventListener("click", (event) => {
+      if (suppressClick) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+
+    carousel.addEventListener("pointercancel", () => {
+      pointerActive = false;
+    });
+
+    if (!reduceMotion) {
+      timerId = window.setTimeout(() => {
+        advance();
+        timerId = window.setInterval(advance, autoplayDelay);
+      }, autoplayDelay + initialOffset);
+    }
+  });
+</script>

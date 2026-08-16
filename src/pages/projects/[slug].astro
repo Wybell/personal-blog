@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostLayout from "../../layouts/PostLayout.astro";
+import SubsectionHeader from "../../components/SubsectionHeader.astro";
 import { getArticleNavigation, getArticleWordCount } from "../../lib/article";
 import { projects } from "../../site.config";
 
@@ -44,11 +45,13 @@ const headings = rendered?.headings ?? [];
 ) : (
 <BaseLayout title={`${project.name} | 项目 | Wybell`} description={project.summary} currentPath="/technical/projects/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">PROJECT</p>
-      <h1>{project.name}</h1>
-      <p>{project.summary}</p>
-    </header>
+    <SubsectionHeader
+      eyebrow={`PROJECT / ${project.name.toUpperCase()}`}
+      title={project.name}
+      description={project.summary}
+      count={`${project.stack.length} 项技术`}
+      updated={project.status}
+    />
 
     <section class="about-layout project-article-layout">
       <article class="about-copy">

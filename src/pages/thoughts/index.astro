@@ -1,40 +1,64 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionDirectoryCard from "../../components/SectionDirectoryCard.astro";
+import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
+import { getThoughtPosts } from "../../lib/thoughts";
+import { sectionPageContent } from "../../site.config";
+
+const [learning, work, life, retrospective] = await Promise.all([
+  getThoughtPosts("learning"),
+  getThoughtPosts("work"),
+  getThoughtPosts("life"),
+  getThoughtPosts("retrospective"),
+]);
+
+const thoughtSections = [
+  { slug: "learning", label: "学习思考", description: "关于如何学习、如何理解一个问题，以及如何把理解变成自己的东西。", posts: learning },
+  { slug: "work", label: "工作感受", description: "从真实工作里看到的协作、交付和自己的变化。", posts: work },
+  { slug: "life", label: "生活感受", description: "对日常、选择和生活节奏的一些不定期记录。", posts: life },
+  { slug: "retrospective", label: "随笔灵思", description: "阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。", posts: retrospective },
+] as const;
+
+const latestThought = [...learning, ...work, ...life, ...retrospective].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
+const pageContent = sectionPageContent.thoughts;
+const orderedThoughtSections = [...thoughtSections].sort((a, b) => {
+  if (a.slug === latestThought?.data.section) return -1;
+  if (b.slug === latestThought?.data.section) return 1;
+  return 0;
+});
 ---
 
 <BaseLayout title="随想录 | Wybell" description="Wybell 对学习、工作和生活的一些记录与思考。" currentPath="/thoughts/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">THOUGHTS</p>
-      <h1>随想录</h1>
-      <p>有些内容还没有结论，但它们值得先被写下来，留在之后回头看的路上。</p>
-    </header>
+    <SectionIndexHeader
+      eyebrow={pageContent.eyebrow}
+      title={pageContent.title}
+      description={pageContent.description}
+      stats={[
+        { label: "内容分区", value: "04" },
+        { label: "公开文章", value: String(thoughtSections.reduce((total, section) => total + section.posts.length, 0)).padStart(2, "0") },
+        { label: "最近更新", value: formatDate(latestThought?.data.pubDate) },
+      ]}
+    />
 
-    <section class="space-card-grid" aria-label="随想录最新内容">
-      <a class="space-card" href="/thoughts/learning/">
-        <div class="overview-card-header"><span class="card-kicker">随想录 · 学习思考</span><span class="card-arrow" aria-hidden="true">↗</span></div>
-        <h2>学习思考</h2>
-        <p>关于如何学习、如何理解一个问题，以及如何把理解变成自己的东西。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
-      <a class="space-card" href="/thoughts/work/">
-        <div class="overview-card-header"><span class="card-kicker">随想录 · 工作感受</span><span class="card-arrow" aria-hidden="true">↗</span></div>
-        <h2>工作感受</h2>
-        <p>从真实工作里看到的协作、交付和自己的变化。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
-      <a class="space-card" href="/thoughts/life/">
-        <div class="overview-card-header"><span class="card-kicker">随想录 · 生活感受</span><span class="card-arrow" aria-hidden="true">↗</span></div>
-        <h2>生活感受</h2>
-        <p>对日常、选择和生活节奏的一些不定期记录。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
-      <a class="space-card" href="/thoughts/retrospective/">
-        <div class="overview-card-header"><span class="card-kicker">随想录 · 随笔灵思</span><span class="card-arrow" aria-hidden="true">↗</span></div>
-        <h2>随笔灵思</h2>
-        <p>阶段里的回望、没有急着下结论的想法，以及慢慢想明白的事情。</p>
-        <span class="card-placeholder">最新内容待补充</span>
-      </a>
+    <section class="section-directory-grid" aria-label="随想录最新内容">
+      {orderedThoughtSections.map((section) => {
+        const post = section.posts[0];
+        return (
+          <SectionDirectoryCard
+            href={`/thoughts/${section.slug}/`}
+            kicker={`随想录 · ${section.label}`}
+            title={section.label}
+            description={section.description}
+            meta={section.posts.length ? undefined : "暂无公开记录"}
+            cover={post?.data.cover}
+            coverAlt={post?.data.coverAlt}
+            className={post?.id === "retrospective-qihun" ? "qihun-directory-card" : undefined}
+            recentPosts={section.posts.slice(0, 3).map((item) => ({ title: item.data.title, meta: formatDate(item.data.pubDate) }))}
+          />
+        );
+      })}
     </section>
   </main>
 </BaseLayout>

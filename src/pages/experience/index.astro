@@ -1,15 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SubsectionHeader from "../../components/SubsectionHeader.astro";
 import { experiences } from "../../site.config";
 ---
 
 <BaseLayout title="工作经历 | Wybell" description="Wybell 的工作实践与交付经验。" currentPath="/technical/experience/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">WORK EXPERIENCE</p>
-      <h1>工作经历</h1>
-      <p>这里记录可以公开表达的工作方法和经验，不公开公司源代码、内部地址、账号、数据库细节或敏感业务规则。</p>
-    </header>
+    <SubsectionHeader
+      eyebrow="TECHNICAL SPACE / EXPERIENCE"
+      title="工作经历"
+      description="这里记录可以公开表达的工作方法和经验，不公开公司源代码、内部地址、账号、数据库细节或敏感业务规则。"
+      count={`${experiences.length.toString().padStart(2, "0")} 段经历`}
+      updated={experiences[0]?.period}
+    />
 
     <section class="experience-list" aria-label="工作经历列表">
       {experiences.map((experience) => (

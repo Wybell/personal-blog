@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import SubsectionHeader from "../../../components/SubsectionHeader.astro";
 
 export async function getStaticPaths() {
   const items = await getCollection("media", ({ data }) => !data.draft);
@@ -18,16 +19,16 @@ const { Content } = await render(item);
 <BaseLayout title={`${item.data.title} | 影像片段 | Wybell`} description={item.data.description} currentPath="/life/media/">
   <main class="container space-page">
     <article class="media-detail">
-      <header class="page-heading space-heading">
-        <p class="eyebrow">LIFE SPACE / MEDIA</p>
-        <h1>{item.data.title}</h1>
-        <p>{item.data.description}</p>
-        <div class="thoughts-post-meta media-detail-meta">
-          <time datetime={item.data.capturedDate.toISOString()}>{item.data.capturedDate.toLocaleDateString("zh-CN")}</time>
-          {item.data.location && <span>{item.data.location}</span>}
-          <span>{item.data.type === "video" ? "视频" : "照片"}</span>
-        </div>
-      </header>
+      <SubsectionHeader
+        eyebrow="LIFE SPACE / MEDIA"
+        title={item.data.title}
+        description={item.data.description}
+        count={item.data.type === "video" ? "视频" : "照片"}
+        updated={item.data.capturedDate.toLocaleDateString("zh-CN")}
+      />
+      <div class="thoughts-post-meta media-detail-meta">
+        {item.data.location && <span>{item.data.location}</span>}
+      </div>
 
       <div class="media-detail-visual">
         {item.data.src ? (

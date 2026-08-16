@@ -1,0 +1,43 @@
+---
+import ArrowUpRight from "./ArrowUpRight.astro";
+
+interface Props {
+  href: string;
+  kicker: string;
+  title: string;
+  description: string;
+  meta?: string;
+  cover?: string;
+  coverAlt?: string;
+  recentPosts?: { title: string; meta: string }[];
+  featured?: boolean;
+  className?: string;
+}
+
+const { href, kicker, title, description, meta, cover, coverAlt, recentPosts, featured = false, className } = Astro.props;
+---
+
+<a class:list={["section-directory-card", className, { featured, "has-cover": Boolean(cover) }]} href={href}>
+  {cover && <img class="section-directory-cover" src={cover} alt={coverAlt ?? `${title} 封面`} loading="lazy" decoding="async" />}
+  <div class="section-directory-content">
+    <div class="overview-card-header">
+      <span class="card-kicker">{kicker}</span>
+      <ArrowUpRight />
+    </div>
+    <h2>{title}</h2>
+    <p>{description}</p>
+    {recentPosts?.length ? (
+      <ol class="section-directory-recent-list" aria-label="最近文章">
+        {recentPosts.slice(0, 3).map((post, index) => (
+          <li>
+            <span class="section-directory-recent-index">{String(index + 1).padStart(2, "0")}</span>
+            <span class="section-directory-recent-title">{post.title}</span>
+            <span class="section-directory-recent-meta">{post.meta}</span>
+          </li>
+        ))}
+      </ol>
+    ) : meta ? (
+      <span class="section-directory-meta">{meta}</span>
+    ) : null}
+  </div>
+</a>

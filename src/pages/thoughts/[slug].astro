@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArrowUpRight from "../../components/ArrowUpRight.astro";
+import SubsectionHeader from "../../components/SubsectionHeader.astro";
 import { sectionNavigation } from "../../site.config";
 import { getThoughtPage, getThoughtPageCount, getThoughtPosts } from "../../lib/thoughts";
 
@@ -16,6 +18,7 @@ export async function getStaticPaths() {
         posts: getThoughtPage(allPosts, 1),
         page: 1,
         totalPages: getThoughtPageCount(allPosts.length),
+        totalCount: allPosts.length,
       },
     });
   }
@@ -23,32 +26,37 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { item, posts, page, totalPages } = Astro.props;
+const { item, posts, page, totalPages, totalCount = posts.length } = Astro.props;
 const section = Astro.params.slug;
 const pagePath = (value: number) => value === 1 ? `/thoughts/${section}/` : `/thoughts/${section}/page/${value}/`;
 ---
 
 <BaseLayout title={`${item.label} | 随想录 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">THOUGHTS / {item.label.toUpperCase()}</p>
-      <h1>{item.label}</h1>
-      <p>每一张卡片对应一篇记录，按时间从新到旧排列。</p>
-    </header>
+    <SubsectionHeader
+      eyebrow={`THOUGHTS / ${item.label.toUpperCase()}`}
+      title={item.label}
+      description="按时间整理还没有急着下结论，但值得先写下来的想法。"
+      count={`${totalCount} 篇`}
+      updated={posts[0] ? posts[0].data.pubDate.toLocaleDateString("zh-CN") : "暂无"}
+    />
 
     {posts.length > 0 ? (
       <section class="thoughts-post-grid" aria-label={`${item.label}文章列表`}>
         {posts.map((post) => (
-          <a class="thoughts-post-card" href={`/thoughts/${section}/${post.id}/`}>
-            <div class="overview-card-header">
-              <span class="card-kicker">随想录 · {item.label}</span>
-              <span class="card-arrow" aria-hidden="true">↗</span>
-            </div>
-            <h2>{post.data.title}</h2>
-            <p>{post.data.description}</p>
-            <div class="thoughts-post-meta">
-              <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
-              {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+          <a class:list={["thoughts-post-card", { "has-cover": Boolean(post.data.cover), "qihun-post-card": post.id === "retrospective-qihun" }]} href={`/thoughts/${section}/${post.id}/`}>
+            {post.data.cover && <img class="thoughts-post-card-cover" src={post.data.cover} alt={post.data.coverAlt ?? `${post.data.title} 封面`} loading="lazy" decoding="async" />}
+            <div class="thoughts-post-card-content">
+              <div class="overview-card-header">
+                <span class="card-kicker">随想录 · {item.label}</span>
+                <ArrowUpRight />
+              </div>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              <div class="thoughts-post-meta">
+                <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+                {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+              </div>
             </div>
           </a>
         ))}

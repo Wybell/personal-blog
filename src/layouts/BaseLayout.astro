@@ -23,6 +23,15 @@ const navigationGroups = [
   { prefixes: ["/about/"], items: sectionNavigation.about },
 ];
 const activeSubnav = navigationGroups.find((group) => group.prefixes.some((prefix) => currentPath.startsWith(prefix)))?.items;
+const pageSection = currentPath === "/"
+  ? "home"
+  : currentPath.startsWith("/life/")
+    ? "life"
+    : currentPath.startsWith("/thoughts/")
+      ? "thoughts"
+      : currentPath.startsWith("/about/")
+        ? "about"
+        : "technical";
 ---
 
 <!doctype html>
@@ -38,7 +47,7 @@ const activeSubnav = navigationGroups.find((group) => group.prefixes.some((prefi
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
-  <body>
+  <body data-page-section={pageSection}>
     <ProfileMasthead currentPath={currentPath} />
     {activeSubnav && <SectionNav items={activeSubnav} currentPath={currentPath} />}
 
@@ -56,8 +65,5 @@ const activeSubnav = navigationGroups.find((group) => group.prefixes.some((prefi
       </div>
     </footer>
 
-    {siteConfig.analytics.provider === "busuanzi" && (
-      <script is:inline async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    )}
   </body>
 </html>

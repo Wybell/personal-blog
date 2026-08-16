@@ -49,14 +49,14 @@ const {
         <div class="post-title-card-content">
           <p class="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
+          <p class="post-lead">{description}</p>
           <div class="post-meta-list" aria-label="文章信息">
             <span>发表于 {pubDate.toLocaleDateString("zh-CN")}</span>
             <span>更新于 {(updatedDate ?? pubDate).toLocaleDateString("zh-CN")}</span>
             <span>{wordCount} 字</span>
-            <span>阅读量 <span id="busuanzi_value_page_pv">统计中</span></span>
           </div>
         </div>
-        {cover && <img class="post-title-card-media" src={cover} alt={coverAlt} />}
+        {cover && <img class="post-title-card-media" src={cover} alt={coverAlt} loading="eager" decoding="async" />}
       </header>
 
       <div class="post-reading-layout">

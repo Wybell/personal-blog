@@ -1,21 +1,27 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { experiences, siteConfig, skills } from "../site.config";
+import SectionIndexHeader from "../components/SectionIndexHeader.astro";
+import { experiences, sectionPageContent, siteConfig, skills } from "../site.config";
 ---
 
 <BaseLayout title="关于我 | Wybell" description="Wybell 的个人介绍、经历、技术方向与联系方式。" currentPath="/about/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">ABOUT WYBELL</p>
-      <h1>关于我</h1>
-      <p>把做过的事情讲清楚，把仍在学习的问题留下来，慢慢成为一个可靠的 Java 后端开发者。</p>
-    </header>
+    <SectionIndexHeader
+      eyebrow={sectionPageContent.about.eyebrow}
+      title={sectionPageContent.about.title}
+      description={sectionPageContent.about.description}
+      stats={[
+        { label: "当前身份", value: "2027 届" },
+        { label: "求职方向", value: "Java 后端" },
+        { label: "所在城市", value: siteConfig.location },
+      ]}
+    />
 
-    <section class="about-layout about-page-layout">
-      <article class="about-copy">
+    <section class="about-direct-layout">
+      <article class="about-lead-content">
         <p>我是 Wybell，一名来自广州的 2027 届软件工程专业学生，目前主要准备 Java 后端开发岗位。这个空间用来记录我做过的项目、实习中遇到的工程问题，以及那些真正被我弄明白的技术细节。</p>
         <p>我的实践从教务系统开始，先建立对 Controller、Service、Mapper 分层、数据库交互、登录认证和缓存的整体认识。之后我独立完成了 AI 面试助手，把简历处理、AI 出题、模拟面试和复盘反馈组织成一条完整的产品链路。</p>
-        <p>在 EventFlow 中，我开始更认真地处理真实业务里的边界：活动审核与发布、角色权限、重复报名、名额扣减，以及并发场景下报名记录和剩余名额的一致性。这个过程让我意识到，后端开发不只是把接口写出来，还要让数据在异常情况下仍然保持正确。</p>
+        <p>在 EventFlow 中，我开始更认真地处理真实业务里的边界：活动审核与发布、角色权限、场次配额、重复报名、名额扣减，以及并发场景下报名记录和剩余名额的一致性。我用条件更新、联合唯一约束和事务把这些规则落到数据库与服务层，再通过 Docker、Nginx 和 GitHub Actions 手动发布链路完成交付。这个过程让我意识到，后端开发不只是把接口写出来，还要让数据在异常情况下仍然保持正确。</p>
         <p>实习期间，我参与企业级组织管理平台的开发，累计完成 73 个经过测试并上线的工单，其中包括 41 个需求和 32 个缺陷。我参与过需求理解、前后端联调、问题定位、测试验证和上线跟踪，也逐渐形成了从“功能实现”到“结果闭环”的工作习惯。</p>
         <h2>我在意什么</h2>
         <ul>
@@ -29,10 +35,10 @@ import { experiences, siteConfig, skills } from "../site.config";
           {skills.map((skill) => <li>{skill}</li>)}
         </ul>
         <h2>接下来</h2>
-        <p>我会继续深入 Java、Spring Boot、MySQL 和 Redis，补足并发、缓存、消息与系统设计方面的基础，同时把项目中的关键决策整理成可以复用的工程经验。比起快速堆叠技术名词，我更希望把每一个真正做过的功能讲清楚、做扎实。</p>
+        <p>我会继续深入 Java、Spring Boot、MySQL 和 Redis，补足并发、缓存、消息与系统设计方面的基础，同时把 EventFlow 中已经验证过的条件更新、事务、权限和发布流程整理成可以复用的工程经验。对于 Redis、RabbitMQ、E2E 和并发压测等尚未接入或验证的能力，我会单独标记边界，不把配置过的组件写成已经落地的业务能力。</p>
       </article>
 
-      <aside class="about-profile">
+      <aside class="about-facts-content">
         <p class="eyebrow">PROFILE</p>
         <h2>{siteConfig.displayName}</h2>
         <dl class="contact-list">
@@ -45,5 +51,6 @@ import { experiences, siteConfig, skills } from "../site.config";
         </dl>
       </aside>
     </section>
+
   </main>
 </BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import ArrowUpRight from "./ArrowUpRight.astro";
 
 interface Props {
   item: CollectionEntry<"media">;
@@ -26,7 +27,7 @@ const { item } = Astro.props;
   <div class="media-card-body">
     <div class="overview-card-header">
       <span class="card-kicker">影像片段</span>
-      <span class="card-arrow" aria-hidden="true">↗</span>
+      <ArrowUpRight />
     </div>
     <h2>{item.data.title}</h2>
     <p>{item.data.description}</p>

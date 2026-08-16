@@ -1,0 +1,20 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  image: string;
+  imageAlt: string;
+}
+
+const { eyebrow, title, description, image, imageAlt } = Astro.props;
+---
+
+<header class="page-heading space-heading space-heading-with-visual">
+  <div class="space-heading-copy">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p>{description}</p>
+  </div>
+  <img class="space-heading-visual" src={image} alt={imageAlt} loading="eager" />
+</header>

@@ -1,0 +1,25 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  count?: string;
+  updated?: string;
+}
+
+const { eyebrow, title, description, count, updated } = Astro.props;
+---
+
+<header class="subsection-header">
+  <div class="subsection-header-copy">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p>{description}</p>
+  </div>
+  {(count || updated) && (
+    <dl class="subsection-header-meta">
+      {count && <div><dt>内容</dt><dd>{count}</dd></div>}
+      {updated && <div><dt>更新</dt><dd>{updated}</dd></div>}
+    </dl>
+  )}
+</header>

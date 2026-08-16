@@ -1,16 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
+import SubsectionHeader from "../../components/SubsectionHeader.astro";
 import { projects } from "../../site.config";
 ---
 
 <BaseLayout title="项目实践 | Wybell" description="Wybell 的项目实践与工程记录。" currentPath="/technical/projects/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">PROJECT PRACTICE</p>
-      <h1>项目实践</h1>
-      <p>三个项目不是三个孤立的作品，而是一条逐渐向前的学习线：从理解分层，到做出完整产品，再到面对业务可靠性和真实交付。</p>
-    </header>
+    <SubsectionHeader
+      eyebrow="TECHNICAL SPACE / PROJECTS"
+      title="项目实践"
+      description="三个项目不是三个孤立的作品，而是一条逐渐向前的学习线：从理解分层，到做出完整产品，再到面对业务可靠性和真实交付。"
+      count={`${projects.length} 个项目`}
+      updated="持续复盘"
+    />
 
     <section class="project-card-grid" aria-label="项目列表">
       {projects.map((project) => <ProjectCard project={project} />)}

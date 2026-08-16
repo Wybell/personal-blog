@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ArrowUpRight from "../../../../components/ArrowUpRight.astro";
+import SubsectionHeader from "../../../../components/SubsectionHeader.astro";
 import { getThoughtPage, getThoughtPageCount, getThoughtPosts } from "../../../../lib/thoughts";
 import { sectionNavigation } from "../../../../site.config";
 
@@ -14,7 +16,7 @@ export async function getStaticPaths() {
     for (let page = 2; page <= totalPages; page += 1) {
       paths.push({
         params: { section, page: String(page) },
-        props: { item, posts: getThoughtPage(allPosts, page), page, totalPages },
+        props: { item, posts: getThoughtPage(allPosts, page), page, totalPages, totalCount: allPosts.length },
       });
     }
   }
@@ -22,25 +24,27 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { item, posts, page, totalPages } = Astro.props;
+const { item, posts, page, totalPages, totalCount } = Astro.props;
 const section = Astro.params.section;
 const pagePath = (value: number) => value === 1 ? `/thoughts/${section}/` : `/thoughts/${section}/page/${value}/`;
 ---
 
 <BaseLayout title={`${item.label} | 随想录 | Wybell`} description={`Wybell 的${item.label}文章列表。`} currentPath={`/thoughts/${section}/`}>
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">THOUGHTS / {item.label.toUpperCase()}</p>
-      <h1>{item.label}</h1>
-      <p>每一张卡片对应一篇记录，按时间从新到旧排列。</p>
-    </header>
+    <SubsectionHeader
+      eyebrow={`THOUGHTS / ${item.label.toUpperCase()}`}
+      title={item.label}
+      description="按时间整理还没有急着下结论，但值得先写下来的想法。"
+      count={`${totalCount} 篇 · 第 ${page} 页`}
+      updated={posts[0] ? posts[0].data.pubDate.toLocaleDateString("zh-CN") : "暂无"}
+    />
 
     <section class="thoughts-post-grid" aria-label={`${item.label}文章列表`}>
       {posts.map((post) => (
         <a class="thoughts-post-card" href={`/thoughts/${section}/${post.id}/`}>
           <div class="overview-card-header">
             <span class="card-kicker">随想录 · {item.label}</span>
-            <span class="card-arrow" aria-hidden="true">↗</span>
+            <ArrowUpRight />
           </div>
           <h2>{post.data.title}</h2>
           <p>{post.data.description}</p>

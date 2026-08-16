@@ -1,5 +1,5 @@
 ---
-import { projects, siteConfig } from "../site.config";
+import { siteConfig } from "../site.config";
 
 interface Props {
   currentPath?: string;
@@ -18,10 +18,12 @@ const isHome = currentPath === "/";
 <header class:list={["masthead", { "masthead-home": isHome, "masthead-inner-page": !isHome }]}>
   <div class="container masthead-inner">
     {isHome ? (
-      <div class="profile-grid">
+      <div class="profile-grid profile-grid-home">
         <section class="intro-card" aria-labelledby="site-intro-title">
           <div class="intro-card-visual" aria-hidden="true">
-            <img src="/home-beach.png" alt="" />
+            <video autoplay muted loop playsinline preload="metadata" poster="/home-autumn-poster.jpg">
+              <source src="/home-autumn.mp4" type="video/mp4" />
+            </video>
           </div>
           <div class="card-kicker">
             <span>PERSONAL SPACE</span>
@@ -37,31 +39,6 @@ const isHome = currentPath === "/";
           </div>
         </section>
 
-        <aside class="identity-card" aria-label="个人资料">
-          <div class="identity-topline">
-            <div class="avatar-placeholder">
-              <img src="/avatar.jpg" alt="Wybell 的头像" />
-            </div>
-            <div>
-              <p class="identity-name">{siteConfig.displayName}</p>
-              <p class="identity-role">{siteConfig.role}</p>
-            </div>
-          </div>
-          <div class="identity-location">{siteConfig.location} · 正在记录</div>
-          <div class="profile-links">
-            {siteConfig.github ? (
-              <a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
-            ) : (
-              <span class="disabled-link">GitHub 待补充</span>
-            )}
-            <a href={`mailto:${siteConfig.email}`}>邮箱 <span aria-hidden="true">↗</span></a>
-          </div>
-          <dl class="profile-stats">
-            <div><dt>项目</dt><dd>{String(projects.length).padStart(2, "0")}</dd></div>
-            <div><dt>文章</dt><dd>{siteConfig.stats.articles}</dd></div>
-            <div><dt>仓库</dt><dd>{siteConfig.stats.repositories}</dd></div>
-          </dl>
-        </aside>
       </div>
     ) : (
       <div class="compact-profile">

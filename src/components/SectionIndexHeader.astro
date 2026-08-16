@@ -1,0 +1,33 @@
+---
+interface SectionStat {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  stats?: readonly SectionStat[];
+}
+
+const { eyebrow, title, description, stats = [] } = Astro.props;
+---
+
+<header class="section-index-header">
+  <div class="section-index-copy">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p>{description}</p>
+  </div>
+  {stats.length > 0 && (
+    <dl class="section-index-stats">
+      {stats.map((stat) => (
+        <div>
+          <dt>{stat.label}</dt>
+          <dd>{stat.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )}
+</header>

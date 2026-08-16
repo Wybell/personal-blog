@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { technicalSectionLabels } from "../lib/technical";
+import ArrowUpRight from "./ArrowUpRight.astro";
 
 interface Props {
   post: CollectionEntry<"blog">;
@@ -10,15 +11,18 @@ const { post } = Astro.props;
 const label = technicalSectionLabels[post.data.section];
 ---
 
-<a class="thoughts-post-card" href={`/posts/${post.id}/`}>
-  <div class="overview-card-header">
-    <span class="card-kicker">技术空间 · {label}</span>
-    <span class="card-arrow" aria-hidden="true">↗</span>
-  </div>
-  <h2>{post.data.title}</h2>
-  <p>{post.data.description}</p>
-  <div class="thoughts-post-meta">
-    <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
-    {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+<a class:list={["thoughts-post-card", { "has-cover": Boolean(post.data.cover) }]} href={`/posts/${post.id}/`}>
+  {post.data.cover && <img class="thoughts-post-card-cover" src={post.data.cover} alt={post.data.coverAlt ?? `${post.data.title} 封面`} loading="lazy" decoding="async" />}
+  <div class="thoughts-post-card-content">
+    <div class="overview-card-header">
+      <span class="card-kicker">技术空间 · {label}</span>
+      <ArrowUpRight />
+    </div>
+    <h2>{post.data.title}</h2>
+    <p>{post.data.description}</p>
+    <div class="thoughts-post-meta">
+      <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+      {post.data.tags.length > 0 && <span>{post.data.tags.join(" / ")}</span>}
+    </div>
   </div>
 </a>

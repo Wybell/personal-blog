@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { experiences, sectionNavigation, siteConfig } from "../../site.config";
+import SubsectionHeader from "../../components/SubsectionHeader.astro";
+import { contactChannels, experiences, sectionNavigation, siteConfig } from "../../site.config";
 
 export function getStaticPaths() {
   return sectionNavigation.about.slice(1).map((item) => ({
@@ -12,27 +13,38 @@ export function getStaticPaths() {
 const { item } = Astro.props;
 const slug = Astro.params.slug;
 const establishedAt = new Date(`${siteConfig.establishedDate}T00:00:00+08:00`);
-const initialSiteAge = Math.max(0, Math.floor((Date.now() - establishedAt.getTime()) / 86400000));
+const formatSiteUptime = (elapsedMs: number) => {
+  const totalMinutes = Math.max(0, Math.floor(elapsedMs / 60000));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  return `${days} 天 ${hours} 小时 ${minutes} 分钟`;
+};
+const initialSiteAge = formatSiteUptime(Date.now() - establishedAt.getTime());
 const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
+const subsectionDescriptions = {
+  experience: "记录从实习到个人项目的实践轨迹，重点保留我实际参与、实现和验证过的内容。",
+  status: "记录当前的学习、求职和项目状态，内容会随着实际进展更新。",
+  contact: "保留适合公开使用的联系方式，项目交流和技术讨论都可以从这里开始。",
+  site: "记录这个个人空间为什么存在，以及它目前是怎样运行的。",
+} as const;
+const subsectionCounts = {
+  experience: "01 段经历",
+  status: "持续更新",
+  contact: "06 个入口",
+  site: "04 项信息",
+} as const;
 ---
 
 <BaseLayout title={`${item.label} | 关于我 | Wybell`} description={`Wybell 的${item.label}内容。`} currentPath={Astro.url.pathname}>
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">ABOUT / {item.label.toUpperCase()}</p>
-      <h1>{item.label}</h1>
-      <p>
-        {slug === "experience"
-          ? "记录从实习到个人项目的实践轨迹，重点保留我实际参与、实现和验证过的内容。"
-          : slug === "status"
-            ? "记录当前的学习、求职和项目状态，内容会随着实际进展更新。"
-            : slug === "contact"
-              ? "保留适合公开使用的联系方式，项目交流和技术讨论都可以从这里开始。"
-              : slug === "site"
-                ? "记录这个个人空间为什么存在，以及它目前是怎样运行的。"
-                : "记录真实经历、当前状态和这个个人空间的变化。"}
-      </p>
-    </header>
+    <SubsectionHeader
+      eyebrow={`ABOUT / ${item.label.toUpperCase()}`}
+      title={item.label}
+      description={subsectionDescriptions[slug as keyof typeof subsectionDescriptions]}
+      count={subsectionCounts[slug as keyof typeof subsectionCounts]}
+      updated={slug === "site" ? establishedDateLabel : "持续更新"}
+    />
     {slug === "experience" && (
       <section class="experience-list" aria-label="经历轨迹">
         {experiences.map((experience) => (
@@ -54,15 +66,40 @@ const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
       <article class="about-copy about-direct-content">
         <p class="eyebrow">CURRENT STATUS</p>
         <h2>目前状态</h2>
-        <p>我是广州大学软件工程专业 2027 届学生，当前以 Java 后端开发为主要求职方向。实习已经结束，两个个人项目已经完成部署，我正在把项目实现、实习经历和技术基础整理成可以被清楚说明的内容，同时继续准备秋招。</p>
-        <p>目前的重点不是继续堆叠项目数量，而是把已经做过的功能讲深：包括 Spring Boot 业务分层、MySQL 数据一致性、JWT 与权限边界、事务、异常场景，以及部署之后如何验证系统确实可用。还没有完成或没有验证过的能力，会继续标记为学习和后续计划。</p>
+        <p>我目前是广州大学软件工程专业 2027 届学生，主要目标是 Java 后端开发岗位，正在准备秋招和后续实习机会。</p>
+
+        <h2>实习经历</h2>
+        <p>我已经完成一段 Java 全栈实习，时间为 2026.05—2026.07，在广州平云信息技术有限公司参与企业级组织管理平台开发。</p>
+        <ul>
+          <li>累计完成 73 个经过测试并上线的工单，其中包括 41 个需求和 32 个缺陷。</li>
+          <li>参与审批、待办、组织权限、费用导入、文件下载、分页、批量导入校验、JSON 解析、数据权限、前后端联调、测试验证和上线跟踪。</li>
+        </ul>
+        <p>这段经历让我获得了真实业务交付经验，不只是完成个人 Demo，也开始熟悉从需求理解、功能实现到测试上线的完整工作流。</p>
+
+        <h2>三个主要项目</h2>
+        <ul>
+          <li><strong>教务系统：</strong>第一个 Java 后端学习项目，帮助我理解 Spring Boot 分层、MyBatis、MySQL、Redis、Spring Security 和基础 CRUD。它的前端交互、测试、异常处理和工程化程度仍然有限。</li>
+          <li><strong>AI 面试助手：</strong>已经完整实现并验证上线，包含简历处理、知识库、AI 出题、模拟面试、SSE 流式输出、答案评分和复盘反馈，形成了较完整的产品闭环。</li>
+          <li><strong>EventFlow：</strong>已经完整实现并验证上线，重点处理活动状态机、审核发布、角色权限、场次配额、重复报名、MySQL 条件更新、唯一约束和事务一致性，并完成 Docker、Nginx、GitHub Actions 和手动发布流程。</li>
+        </ul>
+
+        <h2>核心技术方向</h2>
+        <p>当前主要围绕 Java、Spring Boot、MyBatis/MyBatis-Plus、MySQL、Redis、Spring Security、JWT、事务、权限和数据一致性深入学习，同时接触 Vue、React、TypeScript、SSE、Docker、Nginx、GitHub Actions 和 CI/CD。</p>
+
+        <h2>目前的优势</h2>
+        <ul>
+          <li>有真实实习和上线交付经历，不只是自己编写 Demo。</li>
+          <li>有两个已经部署的完整个人项目，能够接触前后端、数据库、部署和工程交付。</li>
+          <li>EventFlow 已经开始涉及状态机、并发一致性和事务边界。</li>
+          <li>谨慎区分已经实现、已经验证和仍在学习的内容，不随意夸大自己的经验。</li>
+        </ul>
+
         <dl class="about-fact-list">
-          <div><dt>教育背景</dt><dd>广州大学 · 软件工程 · 2027 届</dd></div>
-          <div><dt>求职方向</dt><dd>Java 后端开发</dd></div>
-          <div><dt>所在城市</dt><dd>广州</dd></div>
-          <div><dt>实习状态</dt><dd>已完成 · 73 个工单已测试并上线</dd></div>
-          <div><dt>项目状态</dt><dd>AI 面试助手、EventFlow 已部署</dd></div>
-          <div><dt>当前关注</dt><dd>Java / Spring Boot、MySQL、Redis、事务、权限与数据一致性</dd></div>
+          <div><dt>当前身份</dt><dd>广州大学 2027 届软件工程专业学生</dd></div>
+          <div><dt>主要目标</dt><dd>Java 后端开发岗位</dd></div>
+          <div><dt>实习时间</dt><dd>2026.05—2026.07 · 73 个上线工单</dd></div>
+          <div><dt>项目状态</dt><dd>AI 面试助手、EventFlow 已验证上线</dd></div>
+          <div><dt>持续维护</dt><dd>个人博客与技术记录</dd></div>
         </dl>
       </article>
     )}
@@ -73,8 +110,12 @@ const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
         <h2>联系方式</h2>
         <p>如果你想了解项目、交流技术，或者只是想打个招呼，可以通过下面的方式联系我。</p>
         <dl class="about-fact-list">
-          <div><dt>公开邮箱</dt><dd><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></dd></div>
-          <div><dt>GitHub</dt><dd>{siteConfig.github ? <a href={siteConfig.github} target="_blank" rel="noreferrer">打开主页 ↗</a> : "主页待补充"}</dd></div>
+          <div><dt>{contactChannels.github.label}</dt><dd>{contactChannels.github.value ? <a href={contactChannels.github.value} target="_blank" rel="noreferrer">打开主页 ↗</a> : "主页待补充"}</dd></div>
+          <div><dt>{contactChannels.wechat.label}</dt><dd><a href={contactChannels.wechat.image} target="_blank" rel="noreferrer">查看二维码 ↗</a></dd></div>
+          <div><dt>{contactChannels.email.label}</dt><dd><a href={`mailto:${contactChannels.email.value}`}>{contactChannels.email.value}</a></dd></div>
+          <div><dt>{contactChannels.qq.label}</dt><dd><a href={contactChannels.qq.image} target="_blank" rel="noreferrer">查看二维码 ↗</a></dd></div>
+          <div><dt>{contactChannels.douyin.label}</dt><dd>{contactChannels.douyin.value}</dd></div>
+          <div><dt>{contactChannels.xiaohongshu.label}</dt><dd>{contactChannels.xiaohongshu.value}</dd></div>
         </dl>
       </article>
     )}
@@ -86,8 +127,7 @@ const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
         <p>这是一个用来记录项目、学习、工作和生活的个人空间。内容会随着实际经历慢慢更新，不追求一次完成。</p>
         <dl class="about-fact-list site-fact-list">
           <div><dt>建立时间</dt><dd>{establishedDateLabel}</dd></div>
-          <div><dt>已经运行</dt><dd><span data-site-age data-established={siteConfig.establishedDate}>{initialSiteAge} 天</span></dd></div>
-          <div><dt>累计访问</dt><dd><span id="busuanzi_value_site_pv">统计中</span></dd></div>
+          <div><dt>已经运行</dt><dd><span data-site-age data-established={siteConfig.establishedDate}>{initialSiteAge}</span></dd></div>
           <div><dt>生成方式</dt><dd>Astro · 静态站点</dd></div>
         </dl>
         <ul class="about-inline-list">
@@ -109,8 +149,11 @@ const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
       const start = established ? new Date(`${established}T00:00:00+08:00`).getTime() : Date.now();
 
       const updateSiteAge = () => {
-        const days = Math.max(0, Math.floor((Date.now() - start) / 86400000));
-        siteAge.textContent = `${days} 天`;
+        const totalMinutes = Math.max(0, Math.floor((Date.now() - start) / 60000));
+        const days = Math.floor(totalMinutes / 1440);
+        const hours = Math.floor((totalMinutes % 1440) / 60);
+        const minutes = totalMinutes % 60;
+        siteAge.textContent = `${days} 天 ${hours} 小时 ${minutes} 分钟`;
       };
 
       updateSiteAge();

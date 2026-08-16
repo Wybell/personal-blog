@@ -1,75 +1,85 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArrowUpRight from "../../components/ArrowUpRight.astro";
+import SectionDirectoryCard from "../../components/SectionDirectoryCard.astro";
+import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
 import { getTechnicalPosts } from "../../lib/technical";
-import { experiences, projects, skills } from "../../site.config";
+import { experiences, projects, sectionPageContent, skillGroups } from "../../site.config";
 
-const latestPost = (await getTechnicalPosts("learning"))[0];
-const latestPractice = (await getTechnicalPosts("practice"))[0];
+const [learningPosts, practicePosts] = await Promise.all([
+  getTechnicalPosts("learning"),
+  getTechnicalPosts("practice"),
+]);
+const latestPost = learningPosts[0];
+const latestPractice = practicePosts[0];
 const latestExperience = experiences[0];
+const technicalDates = [latestPost?.data.pubDate, latestPractice?.data.pubDate].filter((date): date is Date => Boolean(date));
+const latestTechnicalDate = technicalDates.sort((a, b) => b.valueOf() - a.valueOf())[0];
+const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
+const pageContent = sectionPageContent.technical;
 ---
 
 <BaseLayout title="技术空间 | Wybell" description="Wybell 的项目、技术学习、技术栈与工程实践。" currentPath="/technical/">
   <main class="container space-page">
-    <header class="page-heading space-heading">
-      <p class="eyebrow">TECHNICAL SPACE</p>
-      <h1>技术空间</h1>
-      <p>把项目、学习和工作里真正做过的事放在一起，记录从想法到交付之间的过程。</p>
-    </header>
+    <SectionIndexHeader
+      eyebrow={pageContent.eyebrow}
+      title={pageContent.title}
+      description={pageContent.description}
+      stats={[
+        { label: "内容分区", value: "05" },
+        { label: "项目数量", value: String(projects.length).padStart(2, "0") },
+        { label: "最近更新", value: formatDate(latestTechnicalDate) },
+      ]}
+    />
 
-    <section class="space-card-grid" aria-label="技术空间内容">
-      <a class="space-card space-card-featured" href="/technical/projects/">
+    <a class="section-feature-card" href="/technical/projects/">
+      <div class="section-feature-card-content">
         <div class="overview-card-header">
           <span class="card-kicker">技术空间 · 项目实践</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
+          <ArrowUpRight />
         </div>
-        <h2>项目实践</h2>
-        <p>从教务系统到 AI 面试助手，再到 EventFlow，三段不同阶段的项目经历。</p>
-        <div class="card-line-list">
-          {projects.map((project) => <span>{project.name}</span>)}
-        </div>
-      </a>
+        <h2>从教务系统到 EventFlow</h2>
+        <p>三个项目对应三个阶段：先建立后端分层和数据交互的基础，再完成完整产品，最后在 EventFlow 中把状态机、权限、场次配额、报名一致性和线上交付放到同一个业务闭环里验证。</p>
+        <span class="section-feature-card-meta">{projects.length.toString().padStart(2, "0")} 个项目 · 34 项后端测试 · 持续复盘</span>
+      </div>
+      <img class="section-feature-card-cover" src="/project-eventflow.png" alt="EventFlow 项目界面封面" loading="eager" />
+    </a>
 
-      <a class="space-card" href={latestPost ? `/posts/${latestPost.id}/` : "/technical/learning/"}>
-        <div class="overview-card-header">
-          <span class="card-kicker">技术空间 · 技术学习</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
-        </div>
-        <h2>{latestPost ? latestPost.data.title : "最近技术记录"}</h2>
-        <p>{latestPost ? latestPost.data.description : "把学习过程中的理解、问题和复盘留下来。"}</p>
-        <span class="card-placeholder">{latestPost ? latestPost.data.pubDate.toLocaleDateString("zh-CN") : "内容待补充"}</span>
-      </a>
-
-      <a class="space-card" href="/technical/stack/">
-        <div class="overview-card-header">
-          <span class="card-kicker">技术空间 · 技术栈</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
-        </div>
-        <h2>目前主要使用</h2>
-        <p>围绕后端、数据、前端和部署持续积累的技术能力。</p>
-        <div class="chip-list">
-          {skills.slice(0, 4).map((skill) => <span>{skill}</span>)}
-        </div>
-      </a>
-
-      <a class="space-card" href={latestPractice ? `/posts/${latestPractice.id}/` : "/technical/practice/"}>
-        <div class="overview-card-header">
-          <span class="card-kicker">技术空间 · 工程实践</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
-        </div>
-        <h2>{latestPractice ? latestPractice.data.title : "工程实践记录"}</h2>
-        <p>{latestPractice ? latestPractice.data.description : "权限、事务、数据一致性、部署和持续交付等问题，会在这里逐步整理成文章。"}</p>
-        <span class="card-placeholder">{latestPractice ? latestPractice.data.pubDate.toLocaleDateString("zh-CN") : "最新实践待补充"}</span>
-      </a>
-
-      <a class="space-card" href="/technical/experience/">
-        <div class="overview-card-header">
-          <span class="card-kicker">技术空间 · 工作经历</span>
-          <span class="card-arrow" aria-hidden="true">↗</span>
-        </div>
-        <h2>{latestExperience.title}</h2>
-        <p>{latestExperience.organization} · {latestExperience.period}</p>
-        <span class="card-placeholder">{latestExperience.summary}</span>
-      </a>
+    <section class="section-directory-grid" aria-label="技术空间内容">
+      <SectionDirectoryCard
+        href="/technical/learning/"
+        kicker="技术空间 · 技术学习"
+        title="技术学习"
+        description="把学习过程中的理解、问题和复盘留下来。"
+        meta={learningPosts.length ? undefined : "暂无公开记录"}
+        cover={latestPost?.data.cover}
+        coverAlt={latestPost?.data.coverAlt}
+        recentPosts={learningPosts.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) }))}
+      />
+      <SectionDirectoryCard
+        href="/technical/stack/"
+        kicker="技术空间 · 技术栈"
+        title="目前主要使用"
+        description="围绕后端、数据、前端和部署持续积累的技术能力。"
+        meta={`${skillGroups.length} 组能力 · 持续调整`}
+      />
+      <SectionDirectoryCard
+        href="/technical/practice/"
+        kicker="技术空间 · 工程实践"
+        title="工程实践"
+        description="权限、事务、数据一致性、部署和持续交付等问题，会在这里逐步整理成文章。"
+        meta={practicePosts.length ? undefined : "暂无公开记录"}
+        cover={latestPractice?.data.cover}
+        coverAlt={latestPractice?.data.coverAlt}
+        recentPosts={practicePosts.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) }))}
+      />
+      <SectionDirectoryCard
+        href="/technical/experience/"
+        kicker="技术空间 · 工作经历"
+        title={latestExperience.title}
+        description={latestExperience.summary}
+        meta={`${latestExperience.organization} · ${latestExperience.period}`}
+      />
     </section>
   </main>
 </BaseLayout>
