@@ -4,7 +4,7 @@ import ArrowUpRight from "../../components/ArrowUpRight.astro";
 import SectionDirectoryCard from "../../components/SectionDirectoryCard.astro";
 import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
 import { getTechnicalPosts } from "../../lib/technical";
-import { experiences, projects, sectionPageContent, skillGroups } from "../../site.config";
+import { experiences, homeSkillGroups, projects, sectionPageContent } from "../../site.config";
 
 const [learningPosts, practicePosts, experiencePosts] = await Promise.all([
   getTechnicalPosts("learning"),
@@ -58,13 +58,26 @@ const pageContent = sectionPageContent.technical;
         coverAlt={latestPost?.data.coverAlt}
         recentPosts={learningPosts.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) }))}
       />
-      <SectionDirectoryCard
-        href="/technical/stack/"
-        kicker="技术空间 · 技术栈"
-        title="目前主要使用"
-        description="围绕后端、数据、前端和部署持续积累的技术能力。"
-        meta={`${skillGroups.length} 组能力 · 持续调整`}
-      />
+      <a class="section-directory-card technical-overview-stack-card" href="/technical/stack/">
+        <div class="section-directory-content">
+          <div class="overview-card-header">
+            <span class="card-kicker">技术空间 · 技术栈</span>
+            <ArrowUpRight />
+          </div>
+          <h2>当前技术栈</h2>
+          <p>按实际接触过的项目方向整理，不代表熟练度排序。</p>
+          <div class="stack-overview-grid">
+            {homeSkillGroups.map((group) => (
+              <div class="stack-overview-group">
+                <span class="stack-overview-label">{group.label}</span>
+                <div class="stack-overview-items">
+                  {group.items.map((skill) => <span>{skill}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </a>
       <SectionDirectoryCard
         href="/technical/practice/"
         kicker="技术空间 · 工程实践"

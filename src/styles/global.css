@@ -4727,6 +4727,43 @@ body {
   padding: 16px;
 }
 
+.section-directory-card.technical-overview-stack-card .section-directory-content {
+  padding: 21px 23px 20px;
+}
+
+.section-directory-card.technical-overview-stack-card h2 {
+  margin-top: 11px;
+}
+
+.section-directory-card.technical-overview-stack-card p {
+  margin-top: 7px;
+  line-height: 1.55;
+}
+
+.section-directory-card.technical-overview-stack-card .stack-overview-grid {
+  flex: 0 0 auto;
+  gap: 10px 18px;
+  margin-top: 13px;
+}
+
+.section-directory-card.technical-overview-stack-card .stack-overview-group {
+  min-height: 0;
+  justify-content: flex-start;
+  padding-top: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--section-accent) 32%, var(--line));
+}
+
+.section-directory-card.technical-overview-stack-card .stack-overview-label {
+  font-size: 0.68rem;
+}
+
+.section-directory-card.technical-overview-stack-card .stack-overview-items {
+  gap: 3px 8px;
+  margin-top: 4px;
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
 .section-directory-cover {
   display: block;
   width: 100%;
