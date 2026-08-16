@@ -96,6 +96,7 @@ const lifePreviews = [
           meta={preview.recentPosts.length ? undefined : preview.placeholder}
           cover={preview.cover}
           coverAlt={preview.coverAlt}
+          className={preview.title === "兴趣爱好" ? "life-overview-featured-card" : undefined}
           recentPosts={preview.recentPosts}
         />
       ))}

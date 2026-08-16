@@ -4721,6 +4721,10 @@ body {
   padding: 0;
 }
 
+.life-overview-featured-card {
+  grid-column: 1 / -1;
+}
+
 .experience-directory-card .section-directory-cover {
   object-fit: contain;
   background: #ffffff;
@@ -5206,6 +5210,10 @@ body {
 
   .section-directory-card.has-cover {
     grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .life-overview-featured-card {
+    grid-column: auto;
   }
 
   .home-main .technical-stack-card .stack-overview-grid {
