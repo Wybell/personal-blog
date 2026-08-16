@@ -1,9 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import ArrowUpRight from "../../components/ArrowUpRight.astro";
 import SectionDirectoryCard from "../../components/SectionDirectoryCard.astro";
 import SectionIndexHeader from "../../components/SectionIndexHeader.astro";
-import { getLifeMedia, getLifePosts, lifeSectionLabels } from "../../lib/life";
+import { getLifeMedia, getLifePosts } from "../../lib/life";
 import { sectionPageContent } from "../../site.config";
 
 const [daily, travel, hobbies, reading, media] = await Promise.all([
@@ -15,13 +14,22 @@ const [daily, travel, hobbies, reading, media] = await Promise.all([
 ]);
 
 const allLifePosts = [...daily, ...travel, ...hobbies, ...reading].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const latestLifePost = allLifePosts[0];
 const latestMedia = media[0];
-const latestLifeDate = latestLifePost?.data.pubDate ?? latestMedia?.data.capturedDate;
+const latestLifeDate = allLifePosts[0]?.data.pubDate ?? latestMedia?.data.capturedDate;
 const formatDate = (date?: Date) => date?.toLocaleDateString("zh-CN") ?? "持续更新";
 const pageContent = sectionPageContent.life;
 
 const lifePreviews = [
+  {
+    href: "/life/hobbies/",
+    region: "生活空间 · 兴趣爱好",
+    title: "兴趣爱好",
+    description: "工作和学习之外，正在慢慢形成的兴趣。",
+    placeholder: hobbies[0]?.data.pubDate.toLocaleDateString("zh-CN") ?? "最新内容待补充",
+    cover: hobbies[0]?.data.cover,
+    coverAlt: hobbies[0]?.data.coverAlt,
+    recentPosts: hobbies.slice(0, 3).map((post) => ({ title: post.data.title, meta: formatDate(post.data.pubDate) })),
+  },
   {
     href: "/life/daily/",
     region: "生活空间 · 日常记录",
@@ -77,19 +85,6 @@ const lifePreviews = [
         { label: "最近更新", value: formatDate(latestLifeDate) },
       ]}
     />
-
-    <a class:list={["section-feature-card", { "without-cover": !latestLifePost?.data.cover }]} href={latestLifePost ? `/life/${latestLifePost.data.section}/${latestLifePost.id}/` : "/life/daily/"}>
-      <div class="section-feature-card-content">
-        <div class="overview-card-header">
-          <span class="card-kicker">{latestLifePost ? `生活空间 · ${lifeSectionLabels[latestLifePost.data.section]}` : "生活空间 · 最新记录"}</span>
-          <ArrowUpRight />
-        </div>
-        <h2>{latestLifePost?.data.title ?? "生活记录"}</h2>
-        <p>{latestLifePost?.data.description ?? "为日常、兴趣和正在发生的小事留一个可以慢慢填充的位置。"}</p>
-        <span class="section-feature-card-meta">{formatDate(latestLifeDate)}</span>
-      </div>
-      {latestLifePost?.data.cover && <img class="section-feature-card-cover" src={latestLifePost.data.cover} alt={latestLifePost.data.coverAlt ?? `${latestLifePost.data.title} 封面`} loading="eager" />}
-    </a>
 
     <section class="section-directory-grid" aria-label="生活空间内容">
       {lifePreviews.map((preview) => (
