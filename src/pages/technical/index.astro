@@ -71,7 +71,7 @@ const pageContent = sectionPageContent.technical;
               <div class="stack-overview-group">
                 <span class="stack-overview-label">{group.label}</span>
                 <div class="stack-overview-items">
-                  {group.items.map((skill) => <span>{skill}</span>)}
+                  {group.items.slice(0, 3).map((skill) => <span>{skill}</span>)}
                 </div>
               </div>
             ))}
