@@ -1,9 +1,9 @@
 # Docker 部署准备
 
-博客使用一个独立的 `nginx:1.27-alpine` 容器运行，默认绑定服务器 `8085` 端口：
+博客使用一个独立的 `nginx:1.27-alpine` 容器运行，默认绑定服务器 `8090` 端口：
 
 ```text
-http://服务器IP:8085/
+http://服务器IP:8090/
 ```
 
 容器使用 Compose 项目名 `wybell-blog`，部署目录建议使用当前 SSH 用户有权限写入的目录，例如：
@@ -20,8 +20,8 @@ http://服务器IP:8085/
 
 | 类型 | 名称 | 值 |
 | --- | --- | --- |
-| Variable | `PUBLIC_SITE_URL` | `http://服务器IP:8085` |
-| Variable | `BLOG_PORT` | `8085` |
+| Variable | `PUBLIC_SITE_URL` | `http://服务器IP:8090` |
+| Variable | `BLOG_PORT` | `8090` |
 | Variable | `DEPLOY_SSH_PORT` | `22`，如果 SSH 使用其他端口再修改 |
 
 添加 Secrets：
@@ -38,12 +38,12 @@ http://服务器IP:8085/
 
 ## 服务器一次性检查
 
-在服务器上确认 Docker 和 Compose 可用，并确认 `8085` 没有被其他程序占用：
+在服务器上确认 Docker 和 Compose 可用，并确认 `8090` 没有被其他程序占用：
 
 ```bash
 docker --version
 docker compose version
-ss -lntp | grep ':8085' || true
+ss -lntp | grep ':8090' || true
 ```
 
 完成 Secrets 和服务器检查后，在 GitHub 的 `Actions -> CD -> Run workflow` 手动执行第一次部署。第一次部署验证成功后，再把 CD 改为 `main` 推送后自动触发。

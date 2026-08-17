@@ -18,7 +18,7 @@ jobs:
       DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
       DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
       DEPLOY_SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
-      BLOG_PORT: ${{ vars.BLOG_PORT || '8085' }}
+      BLOG_PORT: ${{ vars.BLOG_PORT || '8090' }}
       PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
 
     steps:

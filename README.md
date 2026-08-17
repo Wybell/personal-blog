@@ -28,4 +28,4 @@ pnpm build
 
 ## Docker 部署
 
-博客使用独立的 Nginx Docker 容器运行，默认监听服务器 `8085` 端口，不占用现有项目的 `80` 和 `8084` 端口。Docker 部署文件和 GitHub Actions 配置说明见 [`deploy/SETUP.md`](deploy/SETUP.md)。
+博客使用独立的 Nginx Docker 容器运行，默认监听服务器 `8090` 端口，不占用现有项目的 `80`、`8084` 和 `8085` 端口。Docker 部署文件和 GitHub Actions 配置说明见 [`deploy/SETUP.md`](deploy/SETUP.md)。
