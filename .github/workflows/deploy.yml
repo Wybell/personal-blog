@@ -9,7 +9,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     environment: production
     env:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -89,8 +89,13 @@ jobs:
         run: |
           set -euo pipefail
           remote="$DEPLOY_USER@$DEPLOY_HOST"
-          ssh -p "$DEPLOY_SSH_PORT" "$remote" "mkdir -p '$DEPLOY_PATH/dist'"
-          scp -P "$DEPLOY_SSH_PORT" dist.tar.gz deploy/docker-compose.yml deploy/nginx.conf "$remote:$DEPLOY_PATH/"
+          ssh_options=(
+            -o ConnectTimeout=30
+            -o ServerAliveInterval=15
+            -o ServerAliveCountMax=20
+          )
+          ssh -p "$DEPLOY_SSH_PORT" "${ssh_options[@]}" "$remote" "mkdir -p '$DEPLOY_PATH/dist'"
+          timeout 25m scp -P "$DEPLOY_SSH_PORT" "${ssh_options[@]}" dist.tar.gz deploy/docker-compose.yml deploy/nginx.conf "$remote:$DEPLOY_PATH/"
 
       - name: Restart blog container
         shell: bash
