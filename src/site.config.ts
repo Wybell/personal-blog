@@ -107,6 +107,24 @@ export const sectionPageContent = {
 
 export const projects = [
   {
+    slug: "personal-blog",
+    name: "Wybell 个人博客",
+    category: "内容系统 · 静态交付",
+    description: "使用 Astro、Markdown 内容集合和 TypeScript 构建的个人博客，记录项目、技术学习、工程实践、工作与生活。",
+    summary: "这是我把内容建模、固定布局、静态生成和线上交付放在一起实践的项目：文章不再散落在页面代码里，而是通过统一集合进入卡片、详情页和发布入口。",
+    stack: ["Astro", "TypeScript", "Markdown", "Docker", "Nginx", "GitHub Actions"],
+    role: "独立开发",
+    status: "已部署",
+    github: "https://github.com/Wybell/personal-blog",
+    live: "http://81.71.140.104:8090/",
+    accent: "sage",
+    highlights: [
+      "使用 Astro Content Collections 和 Zod schema 统一管理文章标题、日期、分区、封面、标签和草稿状态",
+      "通过项目条目与 projectSlug 关联项目卡片和完整文章，使用静态路由生成文章详情、RSS 和 sitemap",
+      "使用独立 wybell-blog Docker Compose 项目、Nginx 静态容器和 GitHub Actions 手动 CD 发布，隔离服务器已有项目",
+    ],
+  },
+  {
     slug: "student-system",
     name: "教务系统",
     category: "第一个项目 · 基础起点",

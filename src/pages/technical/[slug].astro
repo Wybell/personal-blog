@@ -31,8 +31,8 @@ const { item, posts = [], page = 1, totalPages = 0, totalCount = posts.length } 
 const slug = Astro.params.slug;
 const isArticleSection = slug === "learning" || slug === "practice";
 const pagePath = (value: number) => value === 1 ? `/technical/${slug}/` : `/technical/${slug}/page/${value}/`;
-const sectionDescription = isArticleSection ? "按时间整理已经理解、实践和验证过的技术内容。" : slug === "projects" ? "三个项目对应三个阶段：从建立基础，到完成产品，再到面对真实业务和交付。" : slug === "stack" ? "按实际接触和持续使用过的方向整理，不代表熟练度排序。" : "记录从实习到个人项目的实践轨迹，重点保留实际参与、实现和验证过的内容。";
-const sectionCount = isArticleSection ? `${totalCount} 篇` : slug === "projects" ? "03 个项目" : slug === "stack" ? `${String(skillGroups.length).padStart(2, "0")} 组能力` : "01 段经历";
+const sectionDescription = isArticleSection ? "按时间整理已经理解、实践和验证过的技术内容。" : slug === "projects" ? "四个项目对应四个阶段：从建立基础，到完成产品，再到面对真实业务和交付，最后把内容系统本身做成可持续维护的项目。" : slug === "stack" ? "按实际接触和持续使用过的方向整理，不代表熟练度排序。" : "记录从实习到个人项目的实践轨迹，重点保留实际参与、实现和验证过的内容。";
+const sectionCount = isArticleSection ? `${totalCount} 篇` : slug === "projects" ? "04 个项目" : slug === "stack" ? `${String(skillGroups.length).padStart(2, "0")} 组能力` : "01 段经历";
 const updated = isArticleSection && posts[0] ? posts[0].data.pubDate.toLocaleDateString("zh-CN") : undefined;
 ---
 

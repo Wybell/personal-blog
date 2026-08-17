@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const projectVisual = project.slug === "eventflow" ? "/project-eventflow.png" : project.slug === "ai-interview-assistant" ? "/project-ai-lake.png" : "/technical-learning-card.png";
+const projectVisual = project.slug === "personal-blog" ? "/project-personal-blog.png" : project.slug === "eventflow" ? "/project-eventflow.png" : project.slug === "ai-interview-assistant" ? "/project-ai-lake.png" : "/technical-learning-card.png";
 ---
 
 <article class:list={["project-card", { "has-github": Boolean(project.github) }]}>
