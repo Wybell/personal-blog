@@ -28,7 +28,7 @@ export function getArticleNavigation<T extends ArticleEntry>(posts: T[], current
   const currentIndex = sortedPosts.findIndex((post) => post.id === currentId);
 
   return {
-    previous: currentIndex >= 0 ? sortedPosts[currentIndex + 1] : undefined,
-    next: currentIndex > 0 ? sortedPosts[currentIndex - 1] : undefined,
+    previous: currentIndex > 0 ? sortedPosts[currentIndex - 1] : undefined,
+    next: currentIndex >= 0 ? sortedPosts[currentIndex + 1] : undefined,
   };
 }
