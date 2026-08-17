@@ -1,5 +1,10 @@
 import { execFileSync } from "node:child_process";
 
+function getConfiguredSiteUrl() {
+  const configuredUrl = process.env.PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
+  return configuredUrl || "https://your-domain.example";
+}
+
 function getSiteUpdateCount() {
   try {
     const output = execFileSync("git", ["rev-list", "--count", "HEAD"], { encoding: "utf8" }).trim();
@@ -16,7 +21,7 @@ export const siteConfig = {
   role: "Java 后端开发者",
   title: "Wybell空间 | 记录生活、工作与学习",
   description: "记录项目、学习、工作与生活，把做过的事写下来，把还没想明白的问题留在路上。",
-  url: "https://your-domain.example",
+  url: getConfiguredSiteUrl(),
   establishedDate: "2026-08-13",
   updateCount: getSiteUpdateCount(),
   location: "广州",

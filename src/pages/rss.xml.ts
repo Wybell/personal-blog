@@ -2,15 +2,38 @@ import { getCollection } from "astro:content";
 import { siteConfig } from "../site.config";
 
 export async function GET() {
-  const posts = (await getCollection("blog", ({ data }) => !data.draft))
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const [blogPosts, lifePosts, thoughtPosts] = await Promise.all([
+    getCollection("blog", ({ data }) => !data.draft),
+    getCollection("life", ({ data }) => !data.draft),
+    getCollection("thoughts", ({ data }) => !data.draft),
+  ]);
+  const posts = [
+    ...blogPosts.map((post) => ({
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.pubDate,
+      href: `/posts/${post.id}/`,
+    })),
+    ...lifePosts.map((post) => ({
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.pubDate,
+      href: `/life/${post.data.section}/${post.id}/`,
+    })),
+    ...thoughtPosts.map((post) => ({
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.pubDate,
+      href: `/thoughts/${post.data.section}/${post.id}/`,
+    })),
+  ].sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
   const items = posts.map((post) => `
     <item>
-      <title>${escapeXml(post.data.title)}</title>
-      <description>${escapeXml(post.data.description)}</description>
-      <link>${siteConfig.url}/posts/${post.id}/</link>
-      <guid>${siteConfig.url}/posts/${post.id}/</guid>
-      <pubDate>${post.data.pubDate.toUTCString()}</pubDate>
+      <title>${escapeXml(post.title)}</title>
+      <description>${escapeXml(post.description)}</description>
+      <link>${escapeXml(`${siteConfig.url}${post.href}`)}</link>
+      <guid>${escapeXml(`${siteConfig.url}${post.href}`)}</guid>
+      <pubDate>${post.pubDate.toUTCString()}</pubDate>
     </item>`).join("");
 
   return new Response(`<?xml version="1.0" encoding="UTF-8" ?>
@@ -18,7 +41,8 @@ export async function GET() {
   <channel>
     <title>${escapeXml(siteConfig.title)}</title>
     <description>${escapeXml(siteConfig.description)}</description>
-    <link>${siteConfig.url}</link>${items}
+    <link>${escapeXml(siteConfig.url)}</link>
+    <language>zh-CN</language>${items}
   </channel>
 </rss>`, { headers: { "Content-Type": "application/xml; charset=utf-8" } });
 }

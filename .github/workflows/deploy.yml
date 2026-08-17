@@ -1,0 +1,117 @@
+name: CD
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      DEPLOY_SSH_PORT: ${{ vars.DEPLOY_SSH_PORT || '22' }}
+      BLOG_PORT: ${{ vars.BLOG_PORT || '8090' }}
+      PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate deployment configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for variable in DEPLOY_HOST DEPLOY_USER DEPLOY_PATH DEPLOY_SSH_PRIVATE_KEY DEPLOY_KNOWN_HOSTS PUBLIC_SITE_URL; do
+            if [ -z "${!variable}" ]; then
+              echo "Missing GitHub Actions value: ${variable}" >&2
+              exit 1
+            fi
+          done
+
+          case "$PUBLIC_SITE_URL" in
+            *your-domain.example*)
+              echo "PUBLIC_SITE_URL must be replaced with the server IP and port." >&2
+              exit 1
+              ;;
+          esac
+
+          case "$BLOG_PORT" in
+            ''|*[!0-9]*)
+              echo "BLOG_PORT must be a number." >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Astro site
+        run: pnpm build
+        env:
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+
+      - name: Prepare SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Package static site
+        run: tar -czf dist.tar.gz -C dist .
+
+      - name: Upload deployment files
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$DEPLOY_USER@$DEPLOY_HOST"
+          ssh -p "$DEPLOY_SSH_PORT" "$remote" "mkdir -p '$DEPLOY_PATH/dist'"
+          scp -P "$DEPLOY_SSH_PORT" dist.tar.gz deploy/docker-compose.yml deploy/nginx.conf "$remote:$DEPLOY_PATH/"
+
+      - name: Restart blog container
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$DEPLOY_USER@$DEPLOY_HOST"
+          ssh -p "$DEPLOY_SSH_PORT" "$remote" "BLOG_PORT='$BLOG_PORT' DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          mkdir -p "$DEPLOY_PATH/dist"
+          find "$DEPLOY_PATH/dist" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+          tar -xzf "$DEPLOY_PATH/dist.tar.gz" -C "$DEPLOY_PATH/dist"
+
+          compose() {
+            BLOG_PORT="$BLOG_PORT" docker compose -p wybell-blog -f "$DEPLOY_PATH/docker-compose.yml" "$@"
+          }
+
+          compose pull
+          compose up -d
+          compose ps
+          compose exec -T blog wget -q -O /dev/null http://127.0.0.1/healthz
+
+          rm -f "$DEPLOY_PATH/dist.tar.gz"
+          REMOTE_SCRIPT

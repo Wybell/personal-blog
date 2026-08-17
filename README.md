@@ -1,43 +1,31 @@
-# Astro Starter Kit: Minimal
+# Wybell 个人博客
 
-```sh
-pnpm create astro@latest -- --template minimal
+这是一个使用 Astro 构建的静态个人博客，记录技术项目、学习、工作、生活和随想。
+
+## 本地开发
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+生产构建：
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+pnpm build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+构建结果位于 `dist/` 目录。
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 内容位置
 
-Any static assets, like images, can be placed in the `public/` directory.
+- `src/content/blog/`：技术文章
+- `src/content/life/`：生活文章
+- `src/content/thoughts/`：随想文章
+- `public/`：图片、视频和其他静态资源
 
-## 🧞 Commands
+新增文章后，提交并推送到 GitHub，CI 会自动执行生产构建。
 
-All commands are run from the root of the project, from a terminal:
+## Docker 部署
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+博客使用独立的 Nginx Docker 容器运行，默认监听服务器 `8090` 端口，不占用现有项目的 `80`、`8084` 和 `8085` 端口。Docker 部署文件和 GitHub Actions 配置说明见 [`deploy/SETUP.md`](deploy/SETUP.md)。
