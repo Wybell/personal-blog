@@ -81,33 +81,35 @@ jobs:
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
 
-      - name: Package static site
-        run: tar -czf dist.tar.gz -C dist .
-
       - name: Upload deployment files
         shell: bash
         run: |
           set -euo pipefail
           remote="$DEPLOY_USER@$DEPLOY_HOST"
           ssh_options=(
+            -o BatchMode=yes
             -o ConnectTimeout=30
             -o ServerAliveInterval=15
             -o ServerAliveCountMax=20
           )
           ssh -p "$DEPLOY_SSH_PORT" "${ssh_options[@]}" "$remote" "mkdir -p '$DEPLOY_PATH/dist'"
-          timeout 25m scp -P "$DEPLOY_SSH_PORT" "${ssh_options[@]}" dist.tar.gz deploy/docker-compose.yml deploy/nginx.conf "$remote:$DEPLOY_PATH/"
+          ssh -p "$DEPLOY_SSH_PORT" "${ssh_options[@]}" "$remote" "command -v rsync >/dev/null || { echo 'rsync is required on the deployment server.' >&2; exit 127; }"
+          rsync_ssh="ssh -p $DEPLOY_SSH_PORT -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=20"
+          rsync -az --delete --partial --timeout=60 --info=progress2 -e "$rsync_ssh" dist/ "$remote:$DEPLOY_PATH/dist/"
+          rsync -az --partial --timeout=60 -e "$rsync_ssh" deploy/docker-compose.yml deploy/nginx.conf "$remote:$DEPLOY_PATH/"
 
       - name: Restart blog container
         shell: bash
         run: |
           set -euo pipefail
           remote="$DEPLOY_USER@$DEPLOY_HOST"
-          ssh -p "$DEPLOY_SSH_PORT" "$remote" "BLOG_PORT='$BLOG_PORT' DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_SCRIPT'
+          ssh -p "$DEPLOY_SSH_PORT" \
+            -o BatchMode=yes \
+            -o ConnectTimeout=30 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=20 \
+            "$remote" "BLOG_PORT='$BLOG_PORT' DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_SCRIPT'
           set -euo pipefail
-
-          mkdir -p "$DEPLOY_PATH/dist"
-          find "$DEPLOY_PATH/dist" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
-          tar -xzf "$DEPLOY_PATH/dist.tar.gz" -C "$DEPLOY_PATH/dist"
 
           compose() {
             BLOG_PORT="$BLOG_PORT" docker compose -p wybell-blog -f "$DEPLOY_PATH/docker-compose.yml" "$@"
@@ -117,6 +119,4 @@ jobs:
           compose up -d
           compose ps
           compose exec -T blog wget -q -O /dev/null http://127.0.0.1/healthz
-
-          rm -f "$DEPLOY_PATH/dist.tar.gz"
           REMOTE_SCRIPT

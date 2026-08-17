@@ -38,12 +38,22 @@ http://服务器IP:8090/
 
 ## 服务器一次性检查
 
-在服务器上确认 Docker 和 Compose 可用，并确认 `8090` 没有被其他程序占用：
+在服务器上确认 Docker、Compose 和 `rsync` 可用，并确认 `8090` 没有被其他程序占用：
 
 ```bash
 docker --version
 docker compose version
+rsync --version
 ss -lntp | grep ':8090' || true
 ```
+
+GitHub Actions 使用 `rsync` 增量同步 `dist/`，首次部署会上传完整站点，后续部署只上传新增或变化的文件。请先在服务器安装 `rsync`；Ubuntu/Debian 可以执行：
+
+```bash
+sudo apt-get update
+sudo apt-get install -y rsync
+```
+
+同步只作用于 `DEPLOY_PATH/dist` 和博客自己的 Compose 配置，博客使用 `wybell-blog` Compose 项目单独重启，不会执行其他项目的 `docker compose down`。
 
 完成 Secrets 和服务器检查后，在 GitHub 的 `Actions -> CD -> Run workflow` 手动执行第一次部署。第一次部署验证成功后，再把 CD 改为 `main` 推送后自动触发。
