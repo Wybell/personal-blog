@@ -309,7 +309,7 @@ export const skillGroups = [
 
 export const experiences = [
   {
-    period: "2026.05 - 2026.07",
+    period: "2026.05 - 2026.08",
     title: "Java 全栈实习生",
     organization: "广州平云信息技术有限公司",
     summary: "参与企业级组织管理平台开发，完成需求、缺陷、联调、测试和上线的完整工作流。",
