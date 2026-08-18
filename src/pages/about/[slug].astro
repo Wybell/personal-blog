@@ -22,6 +22,7 @@ const formatSiteUptime = (elapsedMs: number) => {
 };
 const initialSiteAge = formatSiteUptime(Date.now() - establishedAt.getTime());
 const establishedDateLabel = siteConfig.establishedDate.replaceAll("-", ".");
+const latestUpdateDateLabel = siteConfig.latestUpdateDate.replaceAll("-", ".");
 const subsectionDescriptions = {
   experience: "记录从实习到个人项目的实践轨迹，重点保留我实际参与、实现和验证过的内容。",
   status: "记录当前的学习、求职和项目状态，内容会随着实际进展更新。",
@@ -43,7 +44,7 @@ const subsectionCounts = {
       title={item.label}
       description={subsectionDescriptions[slug as keyof typeof subsectionDescriptions]}
       count={subsectionCounts[slug as keyof typeof subsectionCounts]}
-      updated={slug === "site" ? establishedDateLabel : "持续更新"}
+      updated={slug === "site" ? latestUpdateDateLabel : "持续更新"}
     />
     {slug === "experience" && (
       <section class="experience-list" aria-label="经历轨迹">

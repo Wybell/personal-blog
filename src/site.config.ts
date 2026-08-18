@@ -15,6 +15,15 @@ function getSiteUpdateCount() {
   }
 }
 
+function getSiteLatestUpdateDate() {
+  try {
+    const output = execFileSync("git", ["log", "-1", "--format=%cs"], { encoding: "utf8" }).trim();
+    return output || "2026-08-13";
+  } catch {
+    return "2026-08-13";
+  }
+}
+
 export const siteConfig = {
   name: "Wybell空间",
   displayName: "Wybell",
@@ -24,6 +33,7 @@ export const siteConfig = {
   url: getConfiguredSiteUrl(),
   establishedDate: "2026-08-13",
   updateCount: getSiteUpdateCount(),
+  latestUpdateDate: getSiteLatestUpdateDate(),
   location: "广州",
   email: "2458262576@qq.com",
   github: "https://github.com/Wybell",
